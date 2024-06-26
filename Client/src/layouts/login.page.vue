@@ -1,0 +1,151 @@
+<template>
+    <div id="wrapper">
+        <form id="form-login" @submit.prevent="login">
+            <h1 class="form-heading">Hệ thống quản lý văn bản</h1>
+            <div class="form-group">
+                <i class="far fa-user"></i>
+                <input type="text" class="form-input form-control" placeholder="Tên đăng nhập" v-model="username">
+            </div>
+            <div class="form-group">
+                <i class="fas fa-key"></i>
+                <input type="password" class="form-input form-control" placeholder="Mật khẩu" v-model="password"
+                    :type="showPassword ? 'text' : 'password'">
+                <div id="eye" @click="toggleShowPassword">
+                    <i class="far fa-eye"></i>
+                </div>
+            </div>
+            <div>
+                <a href="#" class="forgot-password ">Quên mật khẩu</a>
+            </div>
+            <router-link style="text-decoration: none;" :to="{ name: 'home.page' }"> <button class="form-submit"
+                    type="button">ĐĂNG NHẬP
+                </button></router-link>
+
+        </form>
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            username: '',
+            password: '',
+            showPassword: false
+        };
+    },
+    methods: {
+        login() {
+            // Xử lý đăng nhập ở đây
+            console.log('Đang thực hiện đăng nhập...');
+            console.log('Tên đăng nhập:', this.username);
+            console.log('Mật khẩu:', this.password);
+            // Ví dụ sử dụng axios để gọi API đăng nhập
+            // axios.post('/api/login', { username: this.username, password: this.password })
+            //   .then(response => {
+            //     // Xử lý kết quả đăng nhập
+            //   })
+            //   .catch(error => {
+            //     // Xử lý lỗi
+            //   });
+        },
+        toggleShowPassword() {
+            this.showPassword = !this.showPassword;
+        }
+    }
+};
+</script>
+
+<style scoped>
+a {
+    color: #2e2f3e;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff8906;
+    /* Màu khi hover link */
+}
+
+#wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0f0e17;
+    /* Màu nền */
+}
+
+#form-login {
+    border-radius: 14px;
+    max-width: 400px;
+    background-color: #fffffe;
+    /* Màu nền form */
+    flex-grow: 1;
+    padding: 30px 30px 40px;
+    box-shadow: 0px 0px 17px 2px rgba(255, 255, 255, 0.8);
+    /* Đổ bóng */
+}
+
+.form-heading {
+    font-size: 25px;
+    color: #2e2f3e;
+    /* Màu tiêu đề */
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    border-bottom: 1px solid #fff;
+    /* Đường viền dưới */
+    margin-top: 15px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+.form-group i {
+    color: #fff;
+    /* Màu icon */
+    font-size: 14px;
+    padding-top: 5px;
+    padding-right: 10px;
+}
+
+.form-input {
+    background: transparent;
+    outline: 0;
+    border-radius: 14px;
+    color: #2e2f3e;
+    /* Màu chữ input */
+    flex-grow: 1;
+}
+
+.form-input::placeholder {
+    color: #2e2f3e;
+    /* Màu placeholder */
+}
+
+#eye i {
+    padding-right: 0;
+    cursor: pointer;
+}
+
+.form-submit {
+    background: transparent;
+    border: 1px solid #2e2f3e;
+    /* Viền nút */
+    border-radius: 14px;
+    color: #2e2f3e;
+    /* Màu chữ nút */
+    width: 100%;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    transition: 0.25s ease-in-out;
+    margin-top: 30px;
+}
+
+.form-submit:hover {
+    border: 1px solid #54ffaf;
+    /* Viền nút hover */
+}
+</style>
