@@ -1,13 +1,16 @@
 <template>
     <nav class="navbar">
         <ul>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Documents</a></li>
-            <li><a href="#">Settings</a></li>
             <li>
-                <router-link :to="{ name: 'login.admin' }">Logout</router-link>
+                <div class="db">
+                    <h2>DASHBOARD</h2>
+                </div>
             </li>
 
+            <li class="logout">
+                <router-link :to="{ name: 'login.admin' }">Logout
+                </router-link>
+            </li>
         </ul>
     </nav>
 </template>
@@ -27,19 +30,24 @@ export default {
 .navbar {
     background-color: #0f0e17;
     color: #fffffe;
-    padding: 10px;
+    padding: 13px;
     margin: 0;
 }
 
 .navbar ul {
     list-style: none;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    /* Đẩy các phần tử ra hai bên */
+    align-items: center;
+    /* Căn giữa các phần tử theo chiều dọc */
+    padding: 0;
+    margin: 0;
+    width: 100%;
 }
 
 .navbar li {
     margin: 0 10px;
-    padding-top: 10px;
 }
 
 .navbar a {

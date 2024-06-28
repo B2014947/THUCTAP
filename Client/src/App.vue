@@ -1,7 +1,7 @@
-<!-- App.vue -->
+
 <template>
   <div id="app">
-    <router-view /> <!-- Component sẽ được hiển thị tại đây -->
+    <router-view /> 
   </div>
 </template>
 

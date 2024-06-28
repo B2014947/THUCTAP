@@ -17,7 +17,7 @@
             <div>
                 <a href="#" class="forgot-password ">Quên mật khẩu</a>
             </div>
-            <router-link style="text-decoration: none;" :to="{ name: 'home.page' }"> <button class="form-submit"
+            <router-link style="text-decoration: none;" :to="{ name: 'homepage' }"> <button class="form-submit"
                     type="button">ĐĂNG NHẬP
                 </button></router-link>
 

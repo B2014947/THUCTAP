@@ -1,27 +1,42 @@
 <template>
-    <aside class="sidebar">
+    <div class="sidebar">
         <ul>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Documents</a></li>
-            <li><a href="#">Users</a></li>
-            <li><a href="#">Settings</a></li>
+            <li>
+                <router-link to="/" exact><font-awesome-icon :icon="['fas', 'house']" />Trang chủ</router-link>
+            </li>
+            <li>
+                <router-link to="/document-list">Loại văn bản</router-link>
+            </li>
+            <li>
+                <router-link to="/document-management">Văn bản</router-link>
+            </li>
+            <li>
+                <router-link to="/department-list">Phòng ban</router-link>
+            </li>
+            <li>
+                <router-link to="/member-list">Thành viên</router-link>
+            </li>
+            <li>
+                <router-link to="/role-management">Vai trò thành viên</router-link>
+            </li>
         </ul>
-    </aside>
+    </div>
 </template>
 
 <script>
+
 export default {};
 </script>
 
 <style scoped>
 .sidebar {
-    width: 200px;
-    background-color: #cbc8e0;
+    width: 250px;
+    background-color: #1a1b1d;
     color: #fffffe;
     padding: 20px;
-    height: 100vh;
-    top: 0;
-    left: 0;
+    margin: 0;
+    min-height: 100vh;
+    /* Set the minimum height to 100% of the viewport height */
 }
 
 .sidebar ul {
@@ -36,9 +51,13 @@ export default {};
 .sidebar a {
     color: #fffffe;
     text-decoration: none;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 .sidebar a:hover {
-    color: #ff8906;
+    background-color: #ff8906;
 }
 </style>

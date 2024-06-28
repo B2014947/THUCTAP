@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import routerAdmin from "./routerAD";
 
+
 const routes = [...routerAdmin];
 
 const router = createRouter({
