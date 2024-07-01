@@ -81,13 +81,37 @@ const routerAdmin = [
             },
             // Thêm route cho quản lý văn bản
             {
-                path: "document-management",
-                name: "document.management",
-                component: () => import("@/components/DocumentManagement.vue"),
+                path: "document-out",
+                name: "document.out",
+                component: () => import("@/components/DocumentOut.vue"),
                 meta: {
                     title: "Document Management"
                 }
-            }
+            },
+            {
+                path: "add-document",
+                name: "add-document",
+                component: () => import("@/components/AddDocumentOut.vue"),
+                meta: {
+                    title: "Add New Document"
+                }
+            },
+            {
+                path: "document-in",
+                name: "document.in",
+                component: () => import("@/components/DocumentIn.vue"),
+                meta: {
+                    title: "Document Management"
+                }
+            },
+            {
+                path: "add-document-in",
+                name: "add-document-in",
+                component: () => import("@/components/AddDocumentIn.vue"),
+                meta: {
+                    title: "Add New Document"
+                }
+            },
         ]
     },
     {

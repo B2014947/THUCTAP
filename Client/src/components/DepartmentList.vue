@@ -1,29 +1,31 @@
 <template>
-    <div class="department-list">
-        <h1>Quản lý phòng ban</h1>
-        <button @click="navigateToAddNew()">Thêm mới</button>
-        <input type="text" v-model="searchQuery" placeholder="Tìm kiếm theo tên phòng ban">
-        <table>
-            <thead>
-                <tr>
-                    <th>Số</th>
-                    <th>Tên phòng ban</th>
-                    <th>Ghi chú</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(department, index) in filteredDepartments" :key="department.id">
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ department.name }}</td>
-                    <td>{{ department.note }}</td>
-                    <td>
-                        <button @click="editDepartment(department.id)">Sửa</button>
-                        <button @click="deleteDepartment(department.id)">Xóa</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="page-wrapper">
+        <div class="department-list">
+            <h1>Quản lý phòng ban</h1>
+            <button @click="navigateToAddNew()">Thêm mới</button>
+            <input type="text" v-model="searchQuery" placeholder="Tìm kiếm theo tên phòng ban">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Số</th>
+                        <th>Tên phòng ban</th>
+                        <th>Ghi chú</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(department, index) in filteredDepartments" :key="department.id">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ department.name }}</td>
+                        <td>{{ department.note }}</td>
+                        <td>
+                            <button @click="editDepartment(department.id)">Sửa</button>
+                            <button @click="deleteDepartment(department.id)">Xóa</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -83,36 +85,40 @@ export default {
 html,
 body {
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f4f9;
+    /* Background color for the entire page */
 }
 
 .department-list {
     width: 100%;
-    max-width: 1200px;
-    /* Adjusted to ensure responsiveness */
+    max-width: 1000px;
+    margin: 20px auto;
+    /* Center align and add margin for spacing */
     padding: 20px;
     background-color: #fffffe;
     color: #0f0e17;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     min-height: 100vh;
     /* Ensure it covers the full height of the viewport */
     overflow: auto;
-    /* Allow scrolling if content overflows */
-    margin-top: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow for better separation */
+    /* Allow scrolling if content exceeds viewport height */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    /* Add spacing between table and other elements */
 }
 
 th,
 td {
     border: 1px solid #ddd;
     padding: 8px;
+    text-align: center;
 }
 
 th {
@@ -122,7 +128,7 @@ th {
 
 button {
     margin: 0 5px;
-    padding: 5px 10px;
+    padding: 8px 12px;
     background-color: #ff8906;
     color: #fffffe;
     border: none;
@@ -139,5 +145,12 @@ input[type="text"] {
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+@media (max-width: 1000px) {
+    .department-list {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 </style>
