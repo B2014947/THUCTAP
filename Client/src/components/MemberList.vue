@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="member in filteredMembers" :key="member.id">
+                <tr v-for="(member, index) in filteredMembers" :key="member.id">
                     <td>{{ member.id }}</td>
                     <td>{{ member.username }}</td>
                     <td>{{ member.fullName }}</td>
@@ -40,80 +40,58 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
-    setup() {
-        const searchQuery = ref('');
-        const router = useRouter();
-        const members = ref([]);
+  setup() {
+    const router = useRouter();
+    const searchQuery = ref('');
+    const members = ref([]);
 
-        // Fetch members data from API
-        const fetchMembers = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/members');
-                members.value = response.data;
-            } catch (error) {
-                console.error('Error fetching members:', error);
-            }
-        };
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/members');
+        members.value = response.data;
+      } catch (error) {
+        console.error('Lỗi lấy danh sách thành viên:', error);
+      }
+    };
 
-        // Call fetchMembers when component is mounted
-        onMounted(() => {
-            fetchMembers();
-        });
+    fetchMembers(); // Gọi hàm lấy danh sách thành viên khi component được tạo
 
-        const filteredMembers = computed(() => {
-            return members.value.filter(member => {
-                const query = searchQuery.value.toLowerCase();
-                return (
-                    member.username.toLowerCase().includes(query) ||
-                    member.fullName.toLowerCase().includes(query) ||
-                    member.email.toLowerCase().includes(query) ||
-                    member.phone.includes(query)
-                );
-            });
-        });
+    const filteredMembers = computed(() => {
+      return members.value.filter(member =>
+        member.username.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        member.fullName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        member.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        member.phone.includes(searchQuery.value)
+      );
+    });
 
-        const editMember = (id) => {
-            router.push(`/edit-member/${id}`);
-        };
+    const deleteMember = async (id) => {
+      const confirmed = confirm(`Bạn có chắc muốn xóa thành viên với ID: ${id}?`);
+      if (confirmed) {
+        try {
+          await axios.delete(`http://localhost:5000/api/members/${id}`);
+          members.value = members.value.filter(member => member.id !== id);
+          alert(`Đã xóa thành viên với ID: ${id}`);
+        } catch (error) {
+          console.error('Lỗi xóa thành viên:', error);
+        }
+      }
+    };
 
-        const deleteMember = async (id) => {
-            const confirmed = confirm(`Bạn có chắc muốn xóa thành viên với ID: ${id}?`);
-            if (confirmed) {
-                try {
-                    await axios.delete(`http://localhost:5000/api/members/${id}`);
-                    members.value = members.value.filter(member => member.id !== id);
-                    alert(`Đã xóa thành viên với ID: ${id}`);
-                } catch (error) {
-                    console.error('Error deleting member:', error);
-                    alert('Xóa thành viên không thành công.');
-                }
-            }
-        };
-
-        const navigateToAddNew = () => {
-            router.push('/add-new-member');
-        };
-
-        const navigateToDetail = (id) => {
-            router.push(`/member-detail/${id}`);
-        };
-
-        return {
-            searchQuery,
-            filteredMembers,
-            editMember,
-            deleteMember,
-            navigateToAddNew,
-            navigateToDetail
-        };
-    }
+    return {
+      searchQuery,
+      filteredMembers,
+      deleteMember,
+    };
+  },
 };
 </script>
+
 
 <style scoped>
 * {

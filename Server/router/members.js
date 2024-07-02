@@ -1,39 +1,39 @@
+// file: routes/members.js
+
 const express = require('express');
 const db = require('../db');
 const router = express.Router();
 
 // Lấy danh sách thành viên
-router.get('/departments', (req, res) => {
-    const sql = 'SELECT * FROM departments';
+router.get('/members', (req, res) => {
+    const sql = 'SELECT * FROM members';
     db.query(sql, (err, results) => {
         if (err) {
-            console.error('Error querying database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
+            console.error('Lỗi truy vấn cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
             return;
         }
         res.json(results);
     });
 });
 
+// Lấy thông tin thành viên theo ID
 router.get('/members/:id', (req, res) => {
     const memberId = req.params.id;
     const sql = 'SELECT * FROM members WHERE id = ?';
     db.query(sql, [memberId], (err, results) => {
         if (err) {
-            console.error('Error querying database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
+            console.error('Lỗi truy vấn cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
             return;
         }
         if (results.length === 0) {
-            res.status(404).json({ error: 'Member not found' });
+            res.status(404).json({ error: 'Thành viên không tồn tại' });
             return;
         }
         res.json(results[0]);
     });
 });
-
-
-
 
 // Thêm thành viên mới
 router.post('/members', (req, res) => {
@@ -41,11 +41,11 @@ router.post('/members', (req, res) => {
     const sql = 'INSERT INTO members (username, fullName, email, phone, departmentId, roleId, status) VALUES (?, ?, ?, ?, ?, ?, ?)';
     db.query(sql, [username, fullName, email, phone, departmentId, roleId, status], (err, result) => {
         if (err) {
-            console.error('Error inserting into database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
+            console.error('Lỗi thêm vào cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
             return;
         }
-        res.status(201).json({ message: 'Member added successfully', id: result.insertId });
+        res.status(201).json({ message: 'Thêm thành viên thành công', id: result.insertId });
     });
 });
 
@@ -56,11 +56,11 @@ router.put('/members/:id', (req, res) => {
     const sql = 'UPDATE members SET username = ?, fullName = ?, email = ?, phone = ?, departmentId = ?, roleId = ?, status = ? WHERE id = ?';
     db.query(sql, [username, fullName, email, phone, departmentId, roleId, status, memberId], (err, result) => {
         if (err) {
-            console.error('Error updating database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
+            console.error('Lỗi cập nhật cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
             return;
         }
-        res.json({ message: 'Member updated successfully' });
+        res.json({ message: 'Cập nhật thành viên thành công' });
     });
 });
 
@@ -70,11 +70,11 @@ router.delete('/members/:id', (req, res) => {
     const sql = 'DELETE FROM members WHERE id = ?';
     db.query(sql, [memberId], (err, result) => {
         if (err) {
-            console.error('Error deleting from database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
+            console.error('Lỗi xóa từ cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
             return;
         }
-        res.json({ message: 'Member deleted successfully' });
+        res.json({ message: 'Xóa thành viên thành công' });
     });
 });
 
