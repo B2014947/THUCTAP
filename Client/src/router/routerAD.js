@@ -56,6 +56,14 @@ const routerAdmin = [
                 }
             },
             {
+                path: "member-detail/:id",
+                name: "member.detail",
+                component: () => import("@/components/MemberDetail.vue"),
+                meta: {
+                    title: "Member Detail"
+                }
+            },
+            {
                 path: "add-new-member",
                 name: "add-new-member",
                 component: () => import("@/components/AddNewMember.vue"),

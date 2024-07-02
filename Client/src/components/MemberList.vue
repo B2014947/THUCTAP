@@ -12,7 +12,6 @@
                     <th>Họ và tên</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Số nội bộ</th>
                     <th>Phòng ban</th>
                     <th>Vai trò</th>
                     <th>Trạng thái</th>
@@ -20,17 +19,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(member, index) in filteredMembers" :key="member.id">
+                <tr v-for="member in filteredMembers" :key="member.id">
                     <td>{{ member.id }}</td>
                     <td>{{ member.username }}</td>
                     <td>{{ member.fullName }}</td>
                     <td>{{ member.email }}</td>
                     <td>{{ member.phone }}</td>
-                    <td>{{ member.internalPhone }}</td>
                     <td>{{ member.department }}</td>
                     <td>{{ member.role }}</td>
                     <td>{{ member.status }}</td>
                     <td>
+                        <button @click="navigateToDetail(member.id)">Thông tin chi tiết</button>
                         <button @click="editMember(member.id)">Sửa</button>
                         <button @click="deleteMember(member.id)">Xóa</button>
                     </td>
@@ -41,17 +40,33 @@
 </template>
 
 <script>
-import { members } from '@/data/members.js';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 export default {
     setup() {
         const searchQuery = ref('');
         const router = useRouter();
+        const members = ref([]);
+
+        // Fetch members data from API
+        const fetchMembers = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/members');
+                members.value = response.data;
+            } catch (error) {
+                console.error('Error fetching members:', error);
+            }
+        };
+
+        // Call fetchMembers when component is mounted
+        onMounted(() => {
+            fetchMembers();
+        });
 
         const filteredMembers = computed(() => {
-            return members.filter(member => {
+            return members.value.filter(member => {
                 const query = searchQuery.value.toLowerCase();
                 return (
                     member.username.toLowerCase().includes(query) ||
@@ -63,16 +78,19 @@ export default {
         });
 
         const editMember = (id) => {
-            alert(`Chỉnh sửa thành viên với ID: ${id}`);
+            router.push(`/edit-member/${id}`);
         };
 
-        const deleteMember = (id) => {
+        const deleteMember = async (id) => {
             const confirmed = confirm(`Bạn có chắc muốn xóa thành viên với ID: ${id}?`);
             if (confirmed) {
-                const index = members.findIndex(member => member.id === id);
-                if (index !== -1) {
-                    members.splice(index, 1);
+                try {
+                    await axios.delete(`http://localhost:5000/api/members/${id}`);
+                    members.value = members.value.filter(member => member.id !== id);
                     alert(`Đã xóa thành viên với ID: ${id}`);
+                } catch (error) {
+                    console.error('Error deleting member:', error);
+                    alert('Xóa thành viên không thành công.');
                 }
             }
         };
@@ -81,12 +99,17 @@ export default {
             router.push('/add-new-member');
         };
 
+        const navigateToDetail = (id) => {
+            router.push(`/member-detail/${id}`);
+        };
+
         return {
             searchQuery,
             filteredMembers,
             editMember,
             deleteMember,
-            navigateToAddNew
+            navigateToAddNew,
+            navigateToDetail
         };
     }
 };
