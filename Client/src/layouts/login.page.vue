@@ -11,43 +11,88 @@
                 <input type="password" class="form-input form-control" placeholder="Mật khẩu" v-model="password"
                     :type="showPassword ? 'text' : 'password'">
                 <div id="eye" @click="toggleShowPassword">
-                    <i class="far fa-eye"></i>
+                    <i :class="showPassword ? 'far fa-eye-slash' : 'far fa-eye'"></i>
                 </div>
             </div>
             <div>
-                <a href="#" class="forgot-password ">Quên mật khẩu</a>
+                <a href="#" class="forgot-password">Quên mật khẩu</a>
             </div>
-            <router-link style="text-decoration: none;" :to="{ name: 'homepage' }"> <button class="form-submit"
-                    type="button">ĐĂNG NHẬP
-                </button></router-link>
-
+            <button type="submit" class="form-submit" :disabled="isLoading">{{ isLoading ? 'Đang đăng nhập...' :
+                'ĐĂNGNHẬP' }}</button>
+            <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+            <div v-if="showSuccessMessage" class="success-message">
+                <p>{{ successMessage }}</p>
+            </div>
         </form>
     </div>
 </template>
 
 <script>
+import { axiosInstance } from '@/main'; // Điều chỉnh đường dẫn alias phù hợp với cấu hình của bạn
+
 export default {
     data() {
         return {
             username: '',
             password: '',
-            showPassword: false
+            showPassword: false,
+            errorMessage: '',
+            showSuccessMessage: false,
+            successMessage: '',
+            isLoading: false // Thêm biến isLoading để hiển thị tải khi đang xử lý
         };
     },
     methods: {
-        login() {
-            // Xử lý đăng nhập ở đây
-            console.log('Đang thực hiện đăng nhập...');
-            console.log('Tên đăng nhập:', this.username);
-            console.log('Mật khẩu:', this.password);
-            // Ví dụ sử dụng axios để gọi API đăng nhập
-            // axios.post('/api/login', { username: this.username, password: this.password })
-            //   .then(response => {
-            //     // Xử lý kết quả đăng nhập
-            //   })
-            //   .catch(error => {
-            //     // Xử lý lỗi
-            //   });
+        async login() {
+            try {
+                this.isLoading = true; // Bật biểu tượng tải
+
+                // Gửi yêu cầu đăng nhập
+                const response = await axiosInstance.post('/auth/login', {
+                    username: this.username,
+                    password: this.password
+                });
+
+                // Xử lý kết quả đăng nhập thành công
+                const { message, token } = response.data;
+                console.log(message);
+                console.log('Token:', token);
+
+                // Lưu token vào localStorage hoặc sessionStorage
+                localStorage.setItem('token', token);
+
+                // Hiển thị thông báo đăng nhập thành công và chuyển hướng
+                this.successMessage = message;
+                this.showSuccessMessage = true;
+
+                // Chuyển hướng tới trang chủ sau một khoảng thời gian
+                setTimeout(() => {
+                    this.$router.push('/'); // Chuyển hướng đến trang homepage
+                }, 1000); // Chuyển hướng sau 1 giây (tùy chỉnh thời gian theo ý của bạn)
+            } catch (error) {
+                // Xử lý lỗi đăng nhập
+                console.error('Lỗi đăng nhập:', error);
+
+                // In ra chi tiết lỗi từ response nếu có
+                if (error.response) {
+                    console.error('Response:', error.response);
+                    if (error.response.data && error.response.data.error) {
+                        this.errorMessage = error.response.data.error;
+                    } else {
+                        this.errorMessage = 'Đã xảy ra lỗi trong quá trình đăng nhập.';
+                    }
+                } else if (error.request) {
+                    // In ra lỗi từ request
+                    console.error('Request:', error.request);
+                    this.errorMessage = 'Không kết nối được tới máy chủ.';
+                } else {
+                    // In ra lỗi chung
+                    console.error('Error:', error.message);
+                    this.errorMessage = 'Đã xảy ra lỗi trong quá trình đăng nhập.';
+                }
+            } finally {
+                this.isLoading = false; // Tắt biểu tượng tải
+            }
         },
         toggleShowPassword() {
             this.showPassword = !this.showPassword;
@@ -64,7 +109,6 @@ a {
 
 a:hover {
     color: #ff8906;
-    /* Màu khi hover link */
 }
 
 #wrapper {
@@ -73,31 +117,26 @@ a:hover {
     justify-content: center;
     align-items: center;
     background-color: #0f0e17;
-    /* Màu nền */
 }
 
 #form-login {
     border-radius: 14px;
     max-width: 400px;
     background-color: #fffffe;
-    /* Màu nền form */
     flex-grow: 1;
     padding: 30px 30px 40px;
     box-shadow: 0px 0px 17px 2px rgba(255, 255, 255, 0.8);
-    /* Đổ bóng */
 }
 
 .form-heading {
     font-size: 25px;
     color: #2e2f3e;
-    /* Màu tiêu đề */
     text-align: center;
     margin-bottom: 30px;
 }
 
 .form-group {
     border-bottom: 1px solid #fff;
-    /* Đường viền dưới */
     margin-top: 15px;
     margin-bottom: 20px;
     display: flex;
@@ -105,7 +144,6 @@ a:hover {
 
 .form-group i {
     color: #fff;
-    /* Màu icon */
     font-size: 14px;
     padding-top: 5px;
     padding-right: 10px;
@@ -116,36 +154,67 @@ a:hover {
     outline: 0;
     border-radius: 14px;
     color: #2e2f3e;
-    /* Màu chữ input */
     flex-grow: 1;
 }
 
 .form-input::placeholder {
     color: #2e2f3e;
-    /* Màu placeholder */
+}
+
+#eye {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
 }
 
 #eye i {
-    padding-right: 0;
-    cursor: pointer;
+    font-size: 18px;
 }
 
 .form-submit {
     background: transparent;
     border: 1px solid #2e2f3e;
-    /* Viền nút */
     border-radius: 14px;
     color: #2e2f3e;
-    /* Màu chữ nút */
     width: 100%;
     text-transform: uppercase;
-    padding: 6px 10px;
+    padding: 10px 0;
     transition: 0.25s ease-in-out;
     margin-top: 30px;
 }
 
 .form-submit:hover {
     border: 1px solid #54ffaf;
-    /* Viền nút hover */
+}
+
+.error-message {
+    color: #ff3e3e;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.success-message {
+    background-color: #54ffaf;
+    color: #2e2f3e;
+    border: 1px solid #2e2f3e;
+    border-radius: 14px;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    animation: fadeOut 3s forwards;
+    /* Hiệu ứng fadeOut sau 3 giây */
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 </style>

@@ -1,22 +1,28 @@
-
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import "bootstrap/dist/css/bootstrap.css"
-import "bootstrap/dist/js/bootstrap.js"
-import App from './App.vue'
-import router from './router/index'
-const app = createApp(App)
 import axios from 'axios';
-app.use(createPinia())
-app.use(router)
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import { createPinia } from 'pinia';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.js';
 
-app.config.globalProperties.$axios = axios.create({
-    baseURL: 'http://localhost:5000/api', // Thay đổi baseURL tùy vào cấu hình của backend của bạn
+
+// Cấu hình axios instance để gửi yêu cầu đến API
+export const axiosInstance = axios.create({
+    baseURL: 'http://localhost:5000/api', // Điều chỉnh cho phù hợp với server backend của bạn
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
 
-app.mount('#app')
+const app = createApp(App);
 
+// Sử dụng Pinia cho trạng thái toàn cầu
+app.use(createPinia());
+
+// Sử dụng router Vue.js
+app.use(router);
+
+// Mount ứng dụng vào element có id là app trong index.html
+app.mount('#app');

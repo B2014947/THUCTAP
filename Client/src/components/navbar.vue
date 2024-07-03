@@ -6,22 +6,38 @@
                     <h2>DASHBOARD</h2>
                 </div>
             </li>
-
-            <li class="logout">
-                <router-link :to="{ name: 'login.admin' }">Logout
-                </router-link>
+            <li class="logout" @click="logout">
+                Logout
             </li>
         </ul>
     </nav>
 </template>
 
-<script>
-export default {
-    methods: {
-        logout() {
-            // Xử lý đăng xuất ở đây
-            console.log('Logged out');
+<script setup>
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const logout = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
         }
+
+        // Gọi API đăng xuất
+        const response = await axios.post('http://localhost:5000/api/auth/logout', { token });
+        console.log(response.data); // Log thông báo từ backend (vd: Đăng xuất thành công)
+
+        // Xóa token trong Local Storage
+        localStorage.removeItem('token');
+
+        // Chuyển hướng đến trang đăng nhập
+        router.push('/login');
+    } catch (error) {
+        console.error('Lỗi khi đăng xuất:', error.response ? error.response.data.error : error.message);
+        // Xử lý lỗi khi đăng xuất (vd: Hiển thị thông báo lỗi)
     }
 };
 </script>
@@ -38,9 +54,7 @@ export default {
     list-style: none;
     display: flex;
     justify-content: space-between;
-    /* Đẩy các phần tử ra hai bên */
     align-items: center;
-    /* Căn giữa các phần tử theo chiều dọc */
     padding: 0;
     margin: 0;
     width: 100%;
@@ -48,14 +62,15 @@ export default {
 
 .navbar li {
     margin: 0 10px;
+    cursor: pointer;
+    /* Biểu thị rằng nút logout có thể click */
 }
 
-.navbar a {
-    color: #fffffe;
-    text-decoration: none;
-}
-
-.navbar a:hover {
+.navbar li.logout {
     color: #ff8906;
+}
+
+.navbar li.logout:hover {
+    color: #ffffff;
 }
 </style>

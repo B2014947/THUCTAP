@@ -15,10 +15,6 @@
                     <span>{{ member.username }}</span>
                 </div>
                 <div class="detail-item">
-                    <label>Mật khẩu:</label>
-                    <input type="text" v-model="editedMember.password" :disabled="!isEditing">
-                </div>
-                <div class="detail-item">
                     <label>Họ và tên:</label>
                     <input type="text" v-model="editedMember.fullName" :disabled="!isEditing">
                 </div>
@@ -41,6 +37,10 @@
                 <div class="detail-item">
                     <label>Địa chỉ:</label>
                     <input type="text" v-model="editedMember.address" :disabled="!isEditing">
+                </div>
+                <div class="detail-item" v-if="isEditing">
+                    <label>Mật khẩu:</label>
+                    <input type="password" v-model="editedMember.password">
                 </div>
             </div>
             <div class="detail-group">
@@ -70,15 +70,19 @@
                 </div>
                 <div class="detail-item">
                     <label>Phòng ban:</label>
-                    <input type="text" v-model="editedMember.department" :disabled="!isEditing">
+                    <select v-model="editedMember.departmentId" :disabled="!isEditing">
+                        <option v-for="department in departments" :key="department.id" :value="department.id">
+                            {{ department.name }}
+                        </option>
+                    </select>
                 </div>
                 <div class="detail-item">
                     <label>Vai trò:</label>
-                    <input type="text" v-model="editedMember.role" :disabled="!isEditing">
-                </div>
-                <div class="detail-item">
-                    <label>Trạng thái:</label>
-                    <input type="text" v-model="editedMember.status" :disabled="!isEditing">
+                    <select v-model="editedMember.roleId" :disabled="!isEditing">
+                        <option v-for="role in roles" :key="role.id" :value="role.id">
+                            {{ role.name }}
+                        </option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -92,23 +96,40 @@
         <p>Không tìm thấy thành viên.</p>
     </div>
 </template>
+
+
 <script>
-import { members } from '@/data/members.js';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
+import bcrypt from 'bcryptjs'; // Import bcryptjs
 
 export default {
     setup() {
         const member = ref(null);
         const editedMember = ref(null);
+        const departments = ref([]);
+        const roles = ref([]);
         const route = useRoute();
         const router = useRouter();
         const memberId = route.params.id;
-        let isEditing = ref(false);
+        const isEditing = ref(false);
 
-        onMounted(() => {
-            member.value = members.find(m => m.id === parseInt(memberId));
-            editedMember.value = { ...member.value }; // Khởi tạo thông tin sửa đổi từ thành viên hiện tại
+        // Lấy thông tin thành viên và dữ liệu cho select options
+        onMounted(async () => {
+            try {
+                const [memberResponse, departmentsResponse, rolesResponse] = await Promise.all([
+                    axios.get(`http://localhost:5000/api/members/member-details/${memberId}`),
+                    axios.get('http://localhost:5000/api/departments'),
+                    axios.get('http://localhost:5000/api/roles')
+                ]);
+                member.value = memberResponse.data;
+                editedMember.value = { ...memberResponse.data }; // Tạo bản sao để chỉnh sửa
+                departments.value = departmentsResponse.data;
+                roles.value = rolesResponse.data;
+            } catch (error) {
+                console.error('Error fetching member details:', error);
+            }
         });
 
         const goBack = () => {
@@ -119,15 +140,30 @@ export default {
             isEditing.value = !isEditing.value;
         };
 
-        const saveChanges = () => {
-            Object.assign(member.value, editedMember.value);
-            isEditing.value = false;
-            router.push('/member-list');
+        const saveChanges = async () => {
+            try {
+                const { id, ...updateData } = editedMember.value;
+
+                // Băm mật khẩu nếu có thay đổi
+                if (editedMember.value.password) {
+                    const hashedPassword = await bcrypt.hash(editedMember.value.password, 10); // Băm mật khẩu với salt rounds là 10
+                    updateData.password_hash = hashedPassword; // Lưu vào cột password_hash
+                }
+
+                await axios.put(`http://localhost:5000/api/members/${memberId}`, updateData);
+                Object.assign(member.value, editedMember.value); // Cập nhật thông tin thành viên
+                isEditing.value = false;
+                router.push('/member-list');
+            } catch (error) {
+                console.error('Error saving member changes:', error);
+            }
         };
 
         return {
             member,
             editedMember,
+            departments,
+            roles,
             isEditing,
             toggleEdit,
             saveChanges,
@@ -136,6 +172,9 @@ export default {
     }
 };
 </script>
+
+
+
 <style scoped>
 .member-detail {
     width: 100%;
@@ -146,7 +185,7 @@ export default {
     color: #0f0e17;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Căn giữa nội dung */
+    text-align: center;
 }
 
 .avatar-container {
@@ -163,18 +202,18 @@ export default {
 .detail-container {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap; /* Cho phép các nhóm chi tiết linh hoạt dưới các điều kiện màn hình khác nhau */
+    flex-wrap: wrap;
 }
 
 .detail-group {
-    width: calc(50% - 10px); /* Độ rộng của mỗi nhóm, trừ đi khoảng cách giữa chúng */
+    width: calc(50% - 10px);
     margin-bottom: 20px;
 }
 
 .detail-item {
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #f4f4f9; /* Màu nền nhẹ */
+    background-color: #f4f4f9;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -184,7 +223,8 @@ export default {
 }
 
 .detail-item input,
-.detail-item textarea {
+.detail-item textarea,
+.detail-item select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
@@ -203,7 +243,6 @@ export default {
 }
 
 button {
-    margin-top: 20px;
     padding: 10px 20px;
     background-color: #ff8906;
     color: #fffffe;
@@ -213,6 +252,12 @@ button {
 }
 
 button:hover {
-    background-color: #e53170;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .detail-group {
+        width: 100%;
+    }
 }
 </style>
