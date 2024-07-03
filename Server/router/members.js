@@ -48,39 +48,6 @@ router.get('/members/member-details/:id', (req, res) => {
     });
 });
 
-
-// API để hiển thị chi tiết thành viên
-router.get('/members/member-details/:id', (req, res) => {
-    const memberId = req.params.id;
-    const sql = `
-        SELECT
-            m.*,
-            d.departmentName,
-            r.roleName
-        FROM
-            members m
-        LEFT JOIN
-            departments d ON m.departmentId = d.id
-        LEFT JOIN
-            roles r ON m.roleId = r.id
-        WHERE
-            m.id = ?
-    `;
-    db.query(sql, [memberId], (err, results) => {
-        if (err) {
-            console.error('Lỗi truy vấn cơ sở dữ liệu: ' + err.stack);
-            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
-            return;
-        }
-        if (results.length === 0) {
-            res.status(404).json({ error: 'Thành viên không tồn tại' });
-            return;
-        }
-        res.json(results[0]);
-    });
-});
-
-
 // Thêm thành viên mới
 router.post('/members', async (req, res) => {
     const {
@@ -157,10 +124,8 @@ router.post('/members', async (req, res) => {
     });
 });
 
-
 // Sửa thông tin thành viên
-// Sửa thông tin thành viên, bao gồm cập nhật mật khẩu
-router.put('/members/:id', async (req, res) => {
+router.put('/members/member-details/:id', (req, res) => {
     const memberId = req.params.id;
     const {
         username,
@@ -179,65 +144,47 @@ router.put('/members/:id', async (req, res) => {
         departmentId,
         roleId,
         status,
-        avatarUrl,
-        newPassword // Thêm trường newPassword để nhận mật khẩu mới từ request body
+        avatarUrl
     } = req.body;
 
-    try {
-        let password_hash = null;
+    const sqlUpdate = `
+        UPDATE members 
+        SET username = ?, fullName = ?, email = ?, phone = ?, internalNumber = ?, cmnd = ?, address = ?, startDate = ?, education = ?, qualification = ?, experience = ?, skills = ?, bio = ?, departmentId = ?, roleId = ?, status = ?, avatarUrl = ?
+        WHERE id = ?
+    `;
 
-        // Nếu có newPassword được gửi lên, tiến hành băm mật khẩu mới
-        if (newPassword) {
-            const saltRounds = 10;
-            password_hash = await bcrypt.hash(newPassword, saltRounds);
+    const params = [
+        username,
+        fullName,
+        email,
+        phone,
+        internalNumber,
+        cmnd,
+        address,
+        startDate,
+        education,
+        qualification,
+        experience,
+        skills,
+        bio,
+        departmentId,
+        roleId,
+        status,
+        avatarUrl,
+        memberId
+    ];
+
+    db.query(sqlUpdate, params, (err, result) => {
+        if (err) {
+            console.error('Lỗi cập nhật cơ sở dữ liệu: ' + err.stack);
+            res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
+            return;
         }
-
-        const sqlUpdate = `
-            UPDATE members 
-            SET username = ?, fullName = ?, email = ?, phone = ?, internalNumber = ?, cmnd = ?, address = ?, startDate = ?, education = ?, qualification = ?, experience = ?, skills = ?, bio = ?, departmentId = ?, roleId = ?, status = ?, avatarUrl = ?, 
-                ${newPassword ? 'password_hash = ?' : ''}
-            WHERE id = ?
-        `;
-
-        const params = [
-            username,
-            fullName,
-            email,
-            phone,
-            internalNumber,
-            cmnd,
-            address,
-            startDate,
-            education,
-            qualification,
-            experience,
-            skills,
-            bio,
-            departmentId,
-            roleId,
-            status,
-            avatarUrl,
-            memberId
-        ];
-
-        // Nếu có newPassword, thêm password_hash vào params
-        if (newPassword) {
-            params.splice(-1, 0, password_hash);
-        }
-
-        db.query(sqlUpdate, params, (err, result) => {
-            if (err) {
-                console.error('Lỗi cập nhật cơ sở dữ liệu: ' + err.stack);
-                res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
-                return;
-            }
-            res.json({ message: 'Cập nhật thành viên thành công' });
-        });
-    } catch (error) {
-        console.error('Lỗi xử lý mật khẩu mới: ' + error);
-        res.status(500).json({ error: 'Lỗi xử lý mật khẩu mới' });
-    }
+        res.json({ message: 'Cập nhật thông tin thành viên thành công' });
+    });
 });
+
+
 // Xóa thành viên
 router.delete('/members/:id', (req, res) => {
     const memberId = req.params.id;

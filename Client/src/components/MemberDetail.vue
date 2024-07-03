@@ -97,12 +97,10 @@
     </div>
 </template>
 
-
 <script>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import bcrypt from 'bcryptjs'; // Import bcryptjs
 
 export default {
     setup() {
@@ -144,12 +142,6 @@ export default {
             try {
                 const { id, ...updateData } = editedMember.value;
 
-                // Băm mật khẩu nếu có thay đổi
-                if (editedMember.value.password) {
-                    const hashedPassword = await bcrypt.hash(editedMember.value.password, 10); // Băm mật khẩu với salt rounds là 10
-                    updateData.password_hash = hashedPassword; // Lưu vào cột password_hash
-                }
-
                 await axios.put(`http://localhost:5000/api/members/${memberId}`, updateData);
                 Object.assign(member.value, editedMember.value); // Cập nhật thông tin thành viên
                 isEditing.value = false;
@@ -173,16 +165,14 @@ export default {
 };
 </script>
 
-
-
 <style scoped>
 .member-detail {
     width: 100%;
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #fffffe;
-    color: #0f0e17;
+    background-color: #ffffff;
+    color: #000000;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -245,7 +235,7 @@ export default {
 button {
     padding: 10px 20px;
     background-color: #ff8906;
-    color: #fffffe;
+    color: #ffffff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
