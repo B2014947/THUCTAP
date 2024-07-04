@@ -39,41 +39,37 @@ export default {
             errorMessage: '',
             showSuccessMessage: false,
             successMessage: '',
-            isLoading: false // Thêm biến isLoading để hiển thị tải khi đang xử lý
+            isLoading: false 
         };
     },
     methods: {
         async login() {
             try {
-                this.isLoading = true; // Bật biểu tượng tải
-
-                // Gửi yêu cầu đăng nhập
+                this.isLoading = true; 
                 const response = await axiosInstance.post('/auth/login', {
                     username: this.username,
                     password: this.password
                 });
-
-                // Xử lý kết quả đăng nhập thành công
                 const { message, token } = response.data;
                 console.log(message);
                 console.log('Token:', token);
 
-                // Lưu token vào localStorage hoặc sessionStorage
+
                 localStorage.setItem('token', token);
 
-                // Hiển thị thông báo đăng nhập thành công và chuyển hướng
+
                 this.successMessage = message;
                 this.showSuccessMessage = true;
 
-                // Chuyển hướng tới trang chủ sau một khoảng thời gian
+
                 setTimeout(() => {
-                    this.$router.push('/'); // Chuyển hướng đến trang homepage
-                }, 1000); // Chuyển hướng sau 1 giây (tùy chỉnh thời gian theo ý của bạn)
+                    this.$router.push('/'); 
+                }, 1000);
             } catch (error) {
-                // Xử lý lỗi đăng nhập
+
                 console.error('Lỗi đăng nhập:', error);
 
-                // In ra chi tiết lỗi từ response nếu có
+
                 if (error.response) {
                     console.error('Response:', error.response);
                     if (error.response.data && error.response.data.error) {
@@ -82,16 +78,16 @@ export default {
                         this.errorMessage = 'Đã xảy ra lỗi trong quá trình đăng nhập.';
                     }
                 } else if (error.request) {
-                    // In ra lỗi từ request
+
                     console.error('Request:', error.request);
                     this.errorMessage = 'Không kết nối được tới máy chủ.';
                 } else {
-                    // In ra lỗi chung
+
                     console.error('Error:', error.message);
                     this.errorMessage = 'Đã xảy ra lỗi trong quá trình đăng nhập.';
                 }
             } finally {
-                this.isLoading = false; // Tắt biểu tượng tải
+                this.isLoading = false; 
             }
         },
         toggleShowPassword() {
@@ -205,7 +201,6 @@ a:hover {
     padding: 10px;
     margin-top: 20px;
     animation: fadeOut 3s forwards;
-    /* Hiệu ứng fadeOut sau 3 giây */
 }
 
 @keyframes fadeOut {

@@ -26,18 +26,17 @@ const logout = async () => {
             throw new Error('No token found');
         }
 
-        // Gọi API đăng xuất
-        const response = await axios.post('http://localhost:5000/api/auth/logout', { token });
-        console.log(response.data); // Log thông báo từ backend (vd: Đăng xuất thành công)
 
-        // Xóa token trong Local Storage
+        const response = await axios.post('http://localhost:5000/api/auth/logout', { token });
+        console.log(response.data); 
+
+
         localStorage.removeItem('token');
 
-        // Chuyển hướng đến trang đăng nhập
         router.push('/login');
     } catch (error) {
         console.error('Lỗi khi đăng xuất:', error.response ? error.response.data.error : error.message);
-        // Xử lý lỗi khi đăng xuất (vd: Hiển thị thông báo lỗi)
+
     }
 };
 </script>
@@ -63,7 +62,7 @@ const logout = async () => {
 .navbar li {
     margin: 0 10px;
     cursor: pointer;
-    /* Biểu thị rằng nút logout có thể click */
+
 }
 
 .navbar li.logout {

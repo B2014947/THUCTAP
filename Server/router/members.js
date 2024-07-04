@@ -1,4 +1,4 @@
-// file: routes/members.js
+
 const express = require('express');
 const db = require('../db');
 const bcrypt = require('bcrypt');
@@ -89,7 +89,7 @@ router.post('/members', async (req, res) => {
         avatarUrl
     } = req.body;
 
-    // Kiểm tra xem username đã tồn tại trong CSDL chưa
+
     const checkUsernameQuery = 'SELECT COUNT(*) AS count FROM members WHERE username = ?';
     db.query(checkUsernameQuery, [username], async (err, results) => {
         if (err) {
@@ -101,8 +101,6 @@ router.post('/members', async (req, res) => {
         if (usernameCount > 0) {
             return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
         }
-
-        // Nếu username chưa tồn tại, tiến hành băm mật khẩu và thêm vào CSDL
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
 

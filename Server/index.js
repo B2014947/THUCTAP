@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const membersRouter = require('./router/members');
+const transferDocument = require('./router/transferDocument');
 const departmentsRouter = require('./router/departments');
 const rolesRouter = require('./router/roles');
 const permissionsRouter = require('./router/permissions');
@@ -10,6 +11,8 @@ const documentTypesRouter = require('./router/documentTypes');
 const documentsOutgoingRouter = require('./router/documentsOutgoing');
 const documentsIncomingRouter = require('./router/documentsIncoming');
 const authRouter = require('./router/auth');
+const statusRouter = require('./router/status');
+const priorityRouter = require('./router/priority');
 const authenticateToken = require('./authenticateToken');
 
 const app = express();
@@ -25,6 +28,10 @@ app.get('/public', (req, res) => {
 
 app.use(express.json());
 
+
+app.use('/api/', transferDocument);
+app.use('/api/', priorityRouter);
+app.use('/api/', statusRouter);
 app.use('/api/', rolesRouter);
 app.use('/api/', permissionsRouter);
 app.use('/api/', rolePermissionsRouter);

@@ -114,8 +114,6 @@ export default {
         const router = useRouter();
         const memberId = route.params.id;
         const isEditing = ref(false);
-
-        // Lấy thông tin thành viên và dữ liệu cho select options
         onMounted(async () => {
             try {
                 const [memberResponse, departmentsResponse, rolesResponse] = await Promise.all([
@@ -124,7 +122,7 @@ export default {
                     axios.get('http://localhost:5000/api/roles')
                 ]);
                 member.value = memberResponse.data;
-                editedMember.value = { ...memberResponse.data }; // Tạo bản sao để chỉnh sửa
+                editedMember.value = { ...memberResponse.data }; 
                 departments.value = departmentsResponse.data;
                 roles.value = rolesResponse.data;
             } catch (error) {
@@ -144,7 +142,7 @@ export default {
             try {
                 const { id, ...updateData } = editedMember.value;
                 await axios.put(`http://localhost:5000/api/members/member-details/${memberId}`, updateData);
-                Object.assign(member.value, editedMember.value); // Cập nhật thông tin thành viên
+                Object.assign(member.value, editedMember.value); 
                 isEditing.value = false;
                 router.push('/member-list');
             } catch (error) {

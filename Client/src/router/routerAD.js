@@ -136,6 +136,14 @@ const routerAdmin = [
                     title: "Add New Document"
                 }
             },
+            {
+                path: "memberrc",
+                name: "memberrc",
+                component: () => import("@/components/MembersRecip.vue"),
+                meta: {
+                    title: "Add New Document"
+                }
+            },
         ]
     },
     {

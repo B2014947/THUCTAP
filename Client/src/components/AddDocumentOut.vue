@@ -1,181 +1,159 @@
 <template>
     <div class="add-new-document">
-        <h1>Thông tin văn bản</h1>
-        <form @submit.prevent="addNewDocument">
-            <div class="form-group">
-                <div class="form-row">
-                    <label for="code">Ký hiệu:</label>
-                    <input type="text" id="code" v-model="newDocument.code" disabled>
-                </div>
-                <div class="form-row">
-                    <label for="id">Số ký hiệu (*):</label>
-                    <input type="text" id="id" v-model="newDocument.id" required>
-                </div>
-            </div>
+        <h1>Thông tin văn bản đi</h1>
+        <form @submit.prevent="addNewOutgoingDocument">
             <div class="form-group">
                 <div class="form-row">
                     <label for="name">Tên văn bản (*):</label>
-                    <input type="text" id="name" v-model="newDocument.name" required>
+                    <input type="text" id="name" v-model="newOutgoingDocument.name" required>
                 </div>
-                <div class="form-row">
-                    <label for="summary">Trích yếu (*):</label>
-                    <textarea id="summary" v-model="newDocument.summary" required></textarea>
-                </div>
-            </div>
-            <div class="form-group">
                 <div class="form-row">
                     <label for="documentType">Loại văn bản (*):</label>
-                    <select id="documentType" v-model="newDocument.documentType" required>
-                        <option v-for="(type, index) in documentTypes" :key="index" :value="type.code">{{ type.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="form-row">
-                    <label for="department">Đơn vị soạn thảo:</label>
-                    <select id="department" v-model="newDocument.department" required>
-                        <option v-for="(member, index) in members" :key="index" :value="member.fullName">{{
-                            member.fullName }} - {{ member.role }}</option>
+                    <select id="documentType" v-model="newOutgoingDocument.documentType" required>
+                        <option v-for="type in documentTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <div class="form-row">
-                    <label for="priority">Mức độ khẩn (*):</label>
-                    <select id="priority" v-model="newDocument.priority" required>
-                        <option value="Khẩn cấp">Khẩn cấp</option>
-                        <option value="Ưu tiên">Ưu tiên</option>
-                        <option value="Bình thường">Bình thường</option>
+                    <label for="priority">Mức độ ưu tiên (*):</label>
+                    <select id="priority" v-model="newOutgoingDocument.priority" required>
+                        <option v-for="priority in priorities" :key="priority.id" :value="priority.id">{{ priority.name
+                            }}</option>
                     </select>
                 </div>
                 <div class="form-row">
-                    <label for="status">Trạng thái:</label>
-                    <select id="status" v-model="newDocument.status" required>
-                        <option value="Khởi tạo">Khởi tạo</option>
-                        <option value="Đang xử lý">Đang xử lý</option>
-                        <option value="Hoàn thành">Hoàn thành</option>
-                        <option value="Hủy văn bản">Hủy văn bản</option>
-                        <option value="Bị trả về">Bị trả về</option>
-                        <option value="Đã trả cho người nộp">Đã trả cho người nộp</option>
-                        <option value="Đã chuyển hồ sơ">Đã chuyển hồ sơ</option>
+                    <label for="status">Trạng thái (*):</label>
+                    <select id="status" v-model="newOutgoingDocument.status" required>
+                        <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}
+                        </option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <div class="form-row">
                     <label for="note">Ghi chú:</label>
-                    <textarea id="note" v-model="newDocument.note"></textarea>
-                </div>
-                <div class="form-row">
-                    <label for="currentPosition">Vị trí hiện tại:</label>
-                    <input type="text" id="currentPosition" v-model="newDocument.currentPosition" :disabled="true">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="form-row">
-                    <label for="createdDate">Ngày khởi tạo (*):</label>
-                    <input type="date" id="createdDate" v-model="newDocument.createdDate" required>
+                    <textarea id="note" v-model="newOutgoingDocument.note"></textarea>
                 </div>
                 <div class="form-row">
                     <label for="endDate">Hạn xử lý:</label>
-                    <input type="date" id="endDate" v-model="newDocument.endDate">
+                    <input type="date" id="endDate" v-model="newOutgoingDocument.endDate">
                 </div>
             </div>
             <div class="form-group">
                 <div class="form-row">
-                    <label for="file">File đính kèm:</label>
-                    <input type="file" id="file" @change="handleFileUpload">
+                    <label for="department">Bộ phận phát hành (*):</label>
+                    <select id="department" v-model="newOutgoingDocument.departmentId" required>
+                        <option v-for="department in departments" :key="department.id" :value="department.id">{{
+                            department.name }}</option>
+                    </select>
                 </div>
                 <div class="form-row">
-                    <label for="documentBook">Sổ văn bản:</label>
-                    <select id="documentBook" v-model="newDocument.documentBook" required>
-                        <option value="Sổ văn bản đến">Sổ văn bản đến</option>
-                        <option value="Sổ văn bản đi">Sổ văn bản đi</option>
-                    </select>
+                    <label for="attachedFile">Tệp đính kèm:</label>
+                    <input type="file" id="attachedFile" ref="file" @change="handleFileChange">
                 </div>
             </div>
             <div class="button-group">
                 <button type="submit">Thêm mới</button>
-                <button type="button" @click="submitToLeader">Trình lãnh đạo đơn vị</button>
-                <button type="button" @click="publishDocument">Ban hành</button>
             </div>
         </form>
     </div>
 </template>
 
 <script>
-import { documents } from '@/data/documents'; // Import documents data
-import { documentTypes } from '@/data/documentTypes'; // Import document types data
-import { members } from '@/data/members'; // Import members data
+import axios from 'axios';
 
 export default {
     data() {
         return {
-            newDocument: {
-                code: '',
-                id: '',
+            newOutgoingDocument: {
                 name: '',
-                summary: '',
                 documentType: '',
-                department: '',
-                priority: 'Bình thường',
-                status: 'Khởi tạo',
+                priority: '',
+                status: '',
                 note: '',
-                currentPosition: '', // Will be populated dynamically based on sender's position
-                createdDate: '', // Will be populated with current date
-                endDate: '', // Optional end date
-                file: null, // File attachment
-                documentBook: 'Sổ văn bản đến' // Default document book
+                endDate: '',
+                departmentId: '',
+                attachedFile: null
             },
-            documentTypes: [], // Array to hold document types
-            members: [] // Array to hold members
+            documentTypes: [],
+            priorities: [],
+            statuses: [],
+            departments: []
         };
     },
     mounted() {
-        this.documentTypes = documentTypes; // Assign document types from imported data
-        this.members = members; // Assign members from imported data
+        this.fetchDocumentTypes();
+        this.fetchPriorities();
+        this.fetchStatuses();
+        this.fetchDepartments();
     },
     methods: {
-        addNewDocument() {
-            // Generate document code (combination of document type code and sequence number)
-            const documentType = this.documentTypes.find(type => type.code === this.newDocument.documentType);
-            const sequenceNumber = Math.floor(Math.random() * 1000); // Generate a random sequence number (example)
-            this.newDocument.code = `${documentType.code}-${sequenceNumber}`;
-
-            // Set current position based on sender's position
-            const senderInfo = this.members.find(member => member.fullName === this.newDocument.department);
-            this.newDocument.currentPosition = senderInfo.role; // Assign role as currentPosition for demonstration
-
-            // Convert createdDate to ISO string
-            if (this.newDocument.createdDate) {
-                this.newDocument.createdDate = new Date(this.newDocument.createdDate).toISOString();
-            }
-
-            // Optionally convert endDate to ISO string if provided
-            if (this.newDocument.endDate) {
-                this.newDocument.endDate = new Date(this.newDocument.endDate).toISOString();
-            }
-
-            // Add new document to the documents array
-            documents.push(this.newDocument);
-
-            // Simulate adding document (replace with actual API call or data storage)
-            alert('Đã thêm mới văn bản');
-            console.log('Thông tin văn bản mới:', this.newDocument);
-
-            // Navigate to document list page after adding document
-            this.$router.push('/document-management');
+        fetchDocumentTypes() {
+            axios.get('http://localhost:5000/api/documentTypes')
+                .then(response => {
+                    this.documentTypes = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching document types:', error);
+                });
         },
-        handleFileUpload(event) {
-            // Handle file upload, if needed
-            this.newDocument.file = event.target.files[0];
+        fetchPriorities() {
+            axios.get('http://localhost:5000/api/priorities')
+                .then(response => {
+                    this.priorities = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching priorities:', error);
+                });
         },
-        submitToLeader() {
-            // Logic to submit the document to the leader
-            alert('Đã trình lãnh đạo đơn vị');
+        fetchStatuses() {
+            axios.get('http://localhost:5000/api/statuses')
+                .then(response => {
+                    this.statuses = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching statuses:', error);
+                });
         },
-        publishDocument() {
-            // Logic to publish the document
-            alert('Đã ban hành văn bản');
+        fetchDepartments() {
+            axios.get('http://localhost:5000/api/departments')
+                .then(response => {
+                    this.departments = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching departments:', error);
+                });
+        },
+        handleFileChange(event) {
+            this.newOutgoingDocument.attachedFile = event.target.files[0];
+        },
+        addNewOutgoingDocument() {
+            let formData = new FormData();
+            formData.append('name', this.newOutgoingDocument.name);
+            formData.append('documentType', this.newOutgoingDocument.documentType);
+            formData.append('priority', this.newOutgoingDocument.priority);
+            formData.append('status', this.newOutgoingDocument.status);
+            formData.append('note', this.newOutgoingDocument.note);
+            formData.append('endDate', this.newOutgoingDocument.endDate);
+            formData.append('departmentId', this.newOutgoingDocument.departmentId);
+            formData.append('attachedFile', this.newOutgoingDocument.attachedFile);
+
+            axios.post('http://localhost:5000/api/documentsOutgoing', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+                .then(response => {
+                    alert('Thêm văn bản đi thành công');
+                    console.log('Thông tin văn bản mới:', response.data);
+                    this.$router.push('/document-out');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi thêm văn bản đi:', error);
+                    alert('Lỗi khi thêm văn bản đi');
+                });
         }
     }
 };

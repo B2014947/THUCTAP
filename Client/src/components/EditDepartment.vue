@@ -32,13 +32,12 @@ export default {
         const router = useRouter();
         const departmentId = route.params.id;
 
-        // Lấy thông tin phòng ban và khởi tạo các dữ liệu cần thiết
         onMounted(async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/departments/${departmentId}`);
                 department.value = response.data;
-                editedDepartment.value.name = response.data.name; // Cập nhật tên phòng ban
-                editedDepartment.value.note = response.data.note; // Cập nhật ghi chú
+                editedDepartment.value.name = response.data.name; 
+                editedDepartment.value.note = response.data.note; 
             } catch (error) {
                 console.error('Error fetching department details:', error);
             }
@@ -51,7 +50,7 @@ export default {
         const saveChanges = async () => {
             try {
                 await axios.put(`http://localhost:5000/api/departments/${departmentId}`, editedDepartment.value);
-                Object.assign(department.value, editedDepartment.value); // Cập nhật thông tin phòng ban
+                Object.assign(department.value, editedDepartment.value); 
                 router.push('/department-list');
             } catch (error) {
                 console.error('Error saving department changes:', error);
@@ -69,7 +68,6 @@ export default {
 </script>
 
 <style scoped>
-/* CSS cho trang chỉnh sửa phòng ban */
 .page-wrapper {
     display: flex;
     justify-content: center;

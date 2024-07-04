@@ -39,9 +39,6 @@
                 </tbody>
             </table>
         </div>
-        <!-- Router link for editing a selected role -->
-        <router-link v-if="selectedRoleId !== null" :to="{ path: `/edit-role/${selectedRoleId}` }"
-            class="action-link">Chỉnh sửa vai trò</router-link>
     </div>
 </template>
 

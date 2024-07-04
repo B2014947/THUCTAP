@@ -57,21 +57,17 @@ export default {
     },
     methods: {
         editDocument(id) {
-            // Xử lý chỉnh sửa văn bản
             alert(`Chỉnh sửa văn bản với id: ${id}`);
         },
         deleteDocument(id) {
-            // Xử lý xóa văn bản
             this.documents = this.documents.filter(doc => doc.id !== id);
             alert(`Đã xóa văn bản với id: ${id}`);
         },
         navigateToAddNew() {
-            // Điều hướng sang trang thêm mới
             this.$router.push('/add-new-document');
         },
         search() {
-            // Xử lý tìm kiếm
-            // Bạn có thể gọi hàm này để xử lý tìm kiếm theo từ khóa searchKeyword
+
             console.log('Từ khóa tìm kiếm:', this.searchKeyword);
         }
     }
@@ -96,19 +92,19 @@ body {
     background-color: #fffffe;
     color: #0f0e17;
     min-height: 100vh;
-    /* Ensure it covers the full height of the viewport */
+
     overflow: auto;
-    /* Allow scrolling if content overflows */
+
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow for better separation */
+
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    /* Add spacing between table and search bar */
+
 }
 
 th,
@@ -138,7 +134,7 @@ button:hover {
 
 .search-bar {
     margin-bottom: 20px;
-    /* Add more spacing below search bar */
+
     display: flex;
     align-items: center;
 }
@@ -152,7 +148,7 @@ button:hover {
 
 .search-bar button {
     padding: 8px 12px;
-    /* Adjust button padding for better visual balance */
+
     background-color: #ff8906;
     color: #fffffe;
     border: none;

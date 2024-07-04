@@ -37,7 +37,7 @@ async function addDepartment() {
             note: department.value.note
         });
         alert('Thêm mới phòng ban thành công!');
-        router.push('/department-list'); // Chuyển hướng về danh sách phòng ban sau khi thêm mới
+        router.push('/department-list'); 
     } catch (error) {
         console.error('Lỗi khi thêm mới phòng ban:', error);
         alert('Đã xảy ra lỗi khi thêm mới phòng ban.');
@@ -45,7 +45,7 @@ async function addDepartment() {
 }
 
 function goBack() {
-    router.push('/department-list'); // Quay lại danh sách phòng ban nếu không muốn thêm mới nữa
+    router.push('/department-list');
 }
 </script>
 

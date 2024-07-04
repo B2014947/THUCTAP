@@ -44,7 +44,7 @@ export default {
         const filteredDepartments = ref([]);
         const router = useRouter();
 
-        // Function to fetch departments from backend
+   
         const fetchDepartments = () => {
             axios.get('http://localhost:5000/api/departments')
                 .then(response => {
@@ -55,21 +55,17 @@ export default {
                 });
         };
 
-        // Call fetchDepartments when component is mounted
         onMounted(fetchDepartments);
-
-        // Function to edit department
         const editDepartment = (id) => {
             router.push({ name: 'edit-department', params: { id } });
         };
 
-        // Function to delete department
         const deleteDepartment = (id) => {
             const confirmed = confirm(`Bạn có chắc muốn xóa phòng ban với ID: ${id}?`);
             if (confirmed) {
                 axios.delete(`http://localhost:5000/api/departments/${id}`)
                     .then(() => {
-                        fetchDepartments(); // Refresh department list after deletion
+                        fetchDepartments();
                         alert(`Đã xóa phòng ban với ID: ${id}`);
                     })
                     .catch(error => {
@@ -78,8 +74,6 @@ export default {
                     });
             }
         };
-
-        // Function to navigate to add new department page
         const navigateToAddNew = () => {
             router.push('/add-new-department');
         };
@@ -110,14 +104,13 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #f4f4f9;
-    /* Background color for the entire page */
+ 
 }
 
 .department-list {
     width: 100%;
     max-width: 1000px;
     margin: 20px auto;
-    /* Center align and add margin for spacing */
     padding: 20px;
     background-color: #fffffe;
     color: #0f0e17;
@@ -126,7 +119,6 @@ body {
     min-height: 100vh;
     /* Ensure it covers the full height of the viewport */
     overflow: auto;
-    /* Allow scrolling if content exceeds viewport height */
 }
 
 table {

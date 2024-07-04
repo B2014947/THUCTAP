@@ -2,7 +2,6 @@
     <div class="document-management">
         <h2>Danh sách văn bản gửi đi</h2>
 
-        <!-- Form tìm kiếm -->
         <div class="search-form">
             <form @submit.prevent="searchDocuments">
                 <div class="form-group">
@@ -17,7 +16,10 @@
             </form>
         </div>
 
-        <!-- Bảng danh sách văn bản -->
+        <div class="add-document-button">
+            <button @click="addNewDocument">Thêm mới</button>
+        </div>
+
         <div class="document-table">
             <table>
                 <thead>
@@ -29,7 +31,6 @@
                         <th class="priority">Ưu tiên</th>
                         <th class="status">Trạng thái</th>
                         <th>Ghi chú</th>
-                        <th>Vị trí hiện tại</th>
                         <th>Ngày tạo</th>
                         <th>Ngày kết thúc</th>
                         <th>Tệp đính kèm</th>
@@ -40,12 +41,11 @@
                     <tr v-for="document in filteredDocuments" :key="document.id">
                         <td>{{ document.id }}</td>
                         <td>{{ document.name }}</td>
-                        <td>{{ document.documentType }}</td>
-                        <td>{{ document.sender }}</td>
-                        <td class="priority" :class="priorityClass(document.priority)">{{ document.priority }}</td>
-                        <td class="status" :class="statusClass(document.status)">{{ document.status }}</td>
+                        <td>{{ document.documentTypeName }}</td>
+                        <td>{{ document.senderName }}</td>
+                        <td class="priority" :class="priorityClass(document.priority)">{{ document.priorityName }}</td>
+                        <td class="status" :class="statusClass(document.statusName)">{{ document.statusName }}</td>
                         <td>{{ document.note }}</td>
-                        <td>{{ document.currentPosition }}</td>
                         <td>{{ formatDateTime(document.createdDate) }}</td>
                         <td>{{ formatDateTime(document.endDate) }}</td>
                         <td>
@@ -68,10 +68,10 @@
 export default {
     data() {
         return {
-            documents: [], // Danh sách văn bản
-            searchTerm: '', // Thuật ngữ tìm kiếm
-            selectedPriority: '', // Ưu tiên được chọn
-            priorities: [ // Danh sách ưu tiên
+            documents: [], 
+            searchTerm: '', 
+            selectedPriority: '', 
+            priorities: [ 
                 { id: 1, name: 'Bình thường' },
                 { id: 2, name: 'Quan trọng' },
                 { id: 3, name: 'Khẩn cấp' }
@@ -83,7 +83,6 @@ export default {
     },
     methods: {
         fetchDocuments() {
-            // Gọi API để lấy danh sách văn bản gửi đi từ đường dẫn của bạn
             fetch('http://localhost:5000/api/documentsOutgoing')
                 .then(response => response.json())
                 .then(data => {
@@ -93,21 +92,21 @@ export default {
                     console.error('Error fetching documents:', error);
                 });
         },
+        addNewDocument() {
+            console.log('Thêm mới văn bản');
+            this.$router.push('/add-document'); 
+        },
         editDocument(id) {
-            // Chuyển hướng hoặc thực hiện hành động chỉnh sửa văn bản
             console.log('Chỉnh sửa văn bản có ID:', id);
         },
         deleteDocument(id) {
-            // Xác nhận xóa văn bản
             if (confirm('Bạn có chắc chắn muốn xóa văn bản này?')) {
-                // Gọi API để xóa văn bản
                 fetch(`http://localhost:5000/api/documentsOutgoing/${id}`, {
                     method: 'DELETE'
                 })
                     .then(response => response.json())
                     .then(data => {
                         console.log(data.message);
-                        // Sau khi xóa, cập nhật lại danh sách văn bản
                         this.fetchDocuments();
                     })
                     .catch(error => {
@@ -116,7 +115,7 @@ export default {
             }
         },
         searchDocuments() {
-            // Xử lý tìm kiếm với các tham số như searchTerm và selectedPriority
+
             // Gọi API để tìm kiếm văn bản với các tham số này
             console.log('Đang tìm kiếm với thuật ngữ:', this.searchTerm, 'và ưu tiên:', this.selectedPriority);
         },
@@ -125,19 +124,18 @@ export default {
             return new Date(dateTimeString).toLocaleString();
         },
         priorityClass(priority) {
-            // Hàm trả về lớp CSS tương ứng với mức ưu tiên
-            if (priority === 'Bình thường') {
-                return 'normal';
-            } else if (priority === 'Quan trọng') {
-                return 'priority';
-            } else if (priority === 'Khẩn cấp') {
-                return 'urgent';
-            } else {
-                return '';
+            switch (priority) {
+                case 'Bình thường':
+                    return 'normal';
+                case 'Quan trọng':
+                    return 'priority';
+                case 'Khẩn cấp':
+                    return 'urgent';
+                default:
+                    return '';
             }
         },
         statusClass(status) {
-            // Hàm trả về lớp CSS tương ứng với trạng thái
             switch (status) {
                 case 'Đã khởi tạo':
                     return 'initiated';
@@ -160,7 +158,6 @@ export default {
     },
     computed: {
         filteredDocuments() {
-            // Lọc danh sách văn bản dựa trên thuật ngữ tìm kiếm và ưu tiên được chọn
             if (!this.searchTerm && !this.selectedPriority) {
                 return this.documents;
             }
@@ -168,7 +165,7 @@ export default {
                 const matchesSearch = !this.searchTerm ||
                     document.name.toLowerCase().includes(this.searchTerm.toLowerCase());
                 const matchesPriority = !this.selectedPriority ||
-                    document.priority === this.selectedPriority;
+                    document.priorityName === this.selectedPriority;
                 return matchesSearch && matchesPriority;
             });
         }
@@ -176,8 +173,9 @@ export default {
 };
 </script>
 
+
 <style scoped>
-/* CSS đã được cung cấp */
+
 * {
     margin: 0;
     padding: 0;
@@ -312,7 +310,6 @@ body {
     cursor: pointer;
 }
 
-/* Additional classes for urgency levels */
 .urgent {
     background-color: #e53170;
     color: #fffffe;
@@ -328,7 +325,7 @@ body {
     color: #fffffe;
 }
 
-/* Additional styling for status and priority columns */
+
 td.priority,
 td.status {
     width: 120px;

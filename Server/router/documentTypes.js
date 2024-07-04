@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../db'); // Đảm bảo đường dẫn đúng tới module kết nối cơ sở dữ liệu MySQL
+const db = require('../db'); 
 const router = express.Router();
 
 // Lấy danh sách các loại tài liệu

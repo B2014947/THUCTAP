@@ -54,14 +54,11 @@ export default {
             const roleId = parseInt(route.params.id);
             if (!isNaN(roleId)) {
                 try {
-                    // Lấy thông tin vai trò
                     const roleResponse = await axios.get(
                         `http://localhost:5000/api/roles/${roleId}`
                     );
                     selectedRoleId.value = roleId;
                     selectedRole.value = roleResponse.data;
-
-                    // Lấy tất cả quyền
                     const permissionsResponse = await axios.get(
                         "http://localhost:5000/api/permissions"
                     );

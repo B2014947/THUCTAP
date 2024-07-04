@@ -123,9 +123,9 @@
 </template>
 
 <script>
-import { documents } from '@/data/documents'; // Import documents data
-import { documentTypes } from '@/data/documentTypes'; // Import document types data
-import { members } from '@/data/members'; // Import members data
+import { documents } from '@/data/documents'; 
+import { documentTypes } from '@/data/documentTypes'; 
+import { members } from '@/data/members'; 
 
 export default {
     data() {
@@ -140,23 +140,23 @@ export default {
                 priority: 'Bình thường',
                 status: 'Khởi tạo',
                 note: '',
-                currentPosition: '', // Will be populated dynamically based on sender's position
-                createdDate: '', // Will be populated with current date
-                endDate: '', // Optional end date
-                file: null, // File attachment
-                documentBook: 'Sổ văn bản đến', // Default document book
-                processingContent: '' // Added field for processing content
+                currentPosition: '', 
+                createdDate: '', 
+                endDate: '', 
+                file: null, 
+                documentBook: 'Sổ văn bản đến', 
+                processingContent: '' 
             },
-            documentTypes: [], // Array to hold document types
-            members: [], // Array to hold members
+            documentTypes: [], 
+            members: [], 
             showMemberModal: false,
-            multiSelect: true, // Flag to toggle between multiple and single selection
-            selectedMembers: [] // Array to hold selected members
+            multiSelect: true, 
+            selectedMembers: [] 
         };
     },
     mounted() {
-        this.documentTypes = documentTypes; // Assign document types from imported data
-        this.members = members; // Assign members from imported data
+        this.documentTypes = documentTypes; 
+        this.members = members; 
     },
     methods: {
         showMemberSelection(multiSelect) {

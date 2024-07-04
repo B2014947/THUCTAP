@@ -29,10 +29,8 @@ export default {
     },
     methods: {
         addNewDocument() {
-            // Xử lý logic thêm mới văn bản
-            // Ví dụ: Gửi dữ liệu này lên server, hoặc lưu vào danh sách documents
+  
             alert('Đã thêm mới loại văn bản');
-            // Sau khi thêm thành công, có thể điều hướng về trang danh sách loại văn bản
             this.$router.push('/document-list');
         }
     }

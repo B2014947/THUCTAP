@@ -18,11 +18,11 @@ export const axiosInstance = axios.create({
 
 const app = createApp(App);
 
-// Sử dụng Pinia cho trạng thái toàn cầu
+
 app.use(createPinia());
 
-// Sử dụng router Vue.js
+
 app.use(router);
 
-// Mount ứng dụng vào element có id là app trong index.html
+
 app.mount('#app');

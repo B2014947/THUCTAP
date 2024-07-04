@@ -1,4 +1,4 @@
-// Middleware để xác thực token JWT
+
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -12,8 +12,6 @@ function authenticateToken(req, res, next) {
             console.error('Lỗi xác thực token:', err);
             return res.status(403).json({ error: 'Token không hợp lệ' });
         }
-
-        // Lưu thông tin user từ token vào req để sử dụng trong các middleware và route khác
         req.user = user;
         next();
     });

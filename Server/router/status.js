@@ -11,7 +11,7 @@ router.get('/statuses', (req, res) => {
             res.status(500).json({ error: 'Database error' });
             return;
         }
-        res.json(results); // Trả về danh sách các trạng thái dưới dạng JSON
+        res.json(results); 
     });
 });
 

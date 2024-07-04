@@ -1,8 +1,8 @@
 const express = require('express');
-const db = require('../db'); // Đảm bảo đường dẫn đúng tới module kết nối cơ sở dữ liệu MySQL
+const db = require('../db');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
-// Lấy danh sách các văn bản gửi đi
 router.get('/documentsOutgoing', (req, res) => {
     const sql = `
         SELECT 
@@ -10,21 +10,28 @@ router.get('/documentsOutgoing', (req, res) => {
             doc.name,
             doc.documentType,
             dt.name AS documentTypeName,
+            dt.code AS documentTypeCode, -- Lấy cột code từ documentTypes
             doc.sender,
             mem.fullName AS senderName,
-            doc.priority,
-            doc.status,
+            p.name AS priorityName,
+            s.name AS statusName,
             doc.note,
-            doc.currentPosition,
             doc.createdDate,
             doc.endDate,
-            doc.attachedFile
+            doc.attachedFile,
+            dep.code AS departmentCode -- Lấy cột code từ departments
         FROM 
             documentsOutgoing doc
         LEFT JOIN 
             documentTypes dt ON doc.documentType = dt.id
         LEFT JOIN 
             members mem ON doc.sender = mem.id
+        LEFT JOIN
+            priority p ON doc.priority = p.id
+        LEFT JOIN
+            status s ON doc.status = s.id
+        LEFT JOIN
+            departments dep ON mem.departmentId = dep.id
     `;
 
     db.query(sql, (err, results) => {
@@ -38,7 +45,9 @@ router.get('/documentsOutgoing', (req, res) => {
 });
 
 
-// Lấy thông tin một văn bản gửi đi theo ID
+
+
+
 router.get('/documentsOutgoing/:id', (req, res) => {
     const documentId = req.params.id;
     const sql = 'SELECT * FROM documentsOutgoing WHERE id = ?';
@@ -56,21 +65,42 @@ router.get('/documentsOutgoing/:id', (req, res) => {
     });
 });
 
-// Thêm một văn bản gửi đi mới
+
 router.post('/documentsOutgoing', (req, res) => {
-    const { name, documentType, sender, priority, status, note, currentPosition, attachedFile, createdDate, endDate } = req.body;
-    const sql = 'INSERT INTO documentsOutgoing (name, documentType, sender, priority, status, note, currentPosition, attachedFile, createdDate, endDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(sql, [name, documentType, sender, priority, status, note, currentPosition, attachedFile, createdDate, endDate], (err, result) => {
-        if (err) {
-            console.error('Error inserting into database: ' + err.stack);
-            res.status(500).json({ error: 'Database error' });
-            return;
-        }
-        res.status(201).json({ message: 'Document added successfully', id: result.insertId });
-    });
+    const { name, documentType, priority, status, note, attachedFile, createdDate, endDate, departmentId } = req.body;
+
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+        const token = req.headers.authorization.split(' ')[1];
+        jwt.verify(token, 'your_secret_key', (err, decodedToken) => {
+            if (err) {
+                return res.status(401).json({ error: 'Token không hợp lệ' });
+            }
+            const sql = `
+                INSERT INTO documentsOutgoing 
+                    (name, documentType, sender, priority, status, note, attachedFile, createdDate, endDate, departmentId) 
+                VALUES 
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+
+            db.query(sql, [name, documentType, decodedToken.id, priority, status, note, attachedFile, createdDate, endDate, departmentId], (err, result) => {
+                if (err) {
+                    console.error('Lỗi khi thêm vào cơ sở dữ liệu: ' + err.stack);
+                    res.status(500).json({ error: 'Lỗi cơ sở dữ liệu' });
+                    return;
+                }
+                res.status(201).json({ message: 'Văn bản đi được thêm thành công', id: result.insertId });
+            });
+        });
+    } else {
+        res.status(401).json({ error: 'Không có thông tin xác thực' });
+    }
 });
 
-// Sửa thông tin một văn bản gửi đi
+
+
+
 router.put('/documentsOutgoing/:id', (req, res) => {
     const documentId = req.params.id;
     const { name, documentType, sender, priority, status, note, currentPosition, attachedFile, createdDate, endDate } = req.body;
@@ -85,7 +115,7 @@ router.put('/documentsOutgoing/:id', (req, res) => {
     });
 });
 
-// Xóa một văn bản gửi đi
+
 router.delete('/documentsOutgoing/:id', (req, res) => {
     const documentId = req.params.id;
     const sql = 'DELETE FROM documentsOutgoing WHERE id = ?';

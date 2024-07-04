@@ -50,9 +50,9 @@ body {
     flex: 1;
     padding: 20px;
     background-color: #cbc7c7;
-    /* Assuming the color based on your previous preference */
+
     color: #fffffe;
-    /* Assuming the color based on your previous preference */
+
     min-height: 100vh;
     overflow: auto;
 }

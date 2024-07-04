@@ -1,8 +1,6 @@
 <template>
     <div class="document-management">
         <h1>Quản lý văn bản đến</h1>
-
-        <!-- Form tìm kiếm -->
         <div class="search-form">
             <h2>Tìm kiếm và cập nhật</h2>
             <form @submit.prevent="searchDocuments">
@@ -32,8 +30,6 @@
                 </div>
             </form>
         </div>
-
-        <!-- Bảng danh sách văn bản -->
         <div class="document-table">
             <h2>Danh sách văn đến</h2>
             <button @click="goToAddDocumentPage">Thêm văn bản</button>
@@ -146,31 +142,30 @@ export default {
         },
         searchDocuments() {
             console.log('Đang tìm kiếm văn đến...');
-            // Xử lý tìm kiếm tại đây (ví dụ: gửi yêu cầu API, hoặc xử lý mảng dữ liệu)
         },
         goToAddDocumentPage() {
-            this.$router.push('/add-document-in'); // Điều hướng đến route "/add-document"
+            this.$router.push('/add-document-in');
         },
         viewDocument(id) {
             console.log('Xem chi tiết văn đến', id);
-            // Xử lý xem chi tiết văn bản (ví dụ: hiển thị popup, chuyển hướng trang, ...)
+       
         },
         editDocument(id) {
             console.log('Chỉnh sửa văn đến', id);
-            // Xử lý chỉnh sửa văn bản (ví dụ: hiển thị form chỉnh sửa, gửi yêu cầu API, ...)
+            
         },
         deleteDocument(id) {
             console.log('Xóa văn đến', id);
             this.documents = this.documents.filter(document => document.id !== id);
-            // Xử lý xóa văn bản (ví dụ: gửi yêu cầu API, xóa khỏi mảng dữ liệu, ...)
+         
         },
         transferDocument(id) {
             console.log('Chuyển văn đến', id);
-            // Xử lý chuyển văn bản (ví dụ: gửi yêu cầu API, cập nhật trạng thái, ...)
+          
         },
         processDocument(id) {
             console.log('Chuyển xử lý văn đến', id);
-            // Xử lý chuyển xử lý văn bản (ví dụ: gửi yêu cầu API, cập nhật trạng thái, ...)
+          
         },
         priorityClass(priority) {
             switch (priority) {
@@ -268,7 +263,7 @@ body {
 .document-table {
     margin-bottom: 20px;
     overflow-x: auto;
-    /* Add horizontal scrolling if needed */
+
 }
 
 .document-table table {
@@ -280,7 +275,6 @@ body {
 .document-table td {
     border: 1px solid #ddd;
     padding: 8px;
-    /* Reduce padding to make cells smaller */
     text-align: center;
 }
 
@@ -339,7 +333,7 @@ body {
     cursor: pointer;
 }
 
-/* Additional classes for urgency levels */
+
 .urgent {
     background-color: #e53170;
     color: #fffffe;
@@ -354,8 +348,6 @@ body {
     background-color: #0f0e17;
     color: #fffffe;
 }
-
-/* Additional styling for status and priority columns */
 td.priority,
 td.status {
     width: 120px;

@@ -1,31 +1,31 @@
 <template>
     <div class="homepage">
         <div class="hero-section animated-element">
-            <h1>Welcome to TeleConnect</h1>
-            <p>Your Partner in Telecommunications Solutions</p>
+            <h1>Chào mừng đến với VNPT</h1>
+            <p>Đối tác tin cậy trong giải pháp viễn thông</p>
         </div>
         <div class="company-info animated-element">
-            <h2>About Us</h2>
+            <h2>Về chúng tôi</h2>
             <p>
-                TeleConnect is dedicated to providing cutting-edge telecommunications services
-                to businesses and individuals worldwide. Our mission is to connect people and
-                businesses seamlessly through innovative technology solutions.
+                VNPT cam kết cung cấp các dịch vụ viễn thông tiên tiến cho doanh nghiệp và cá nhân trên toàn thế giới.
+                Sứ mệnh của chúng tôi là kết nối mọi người và doanh nghiệp một cách liền mạch thông qua các giải pháp
+                công nghệ đổi mới.
             </p>
         </div>
         <div class="services animated-element">
-            <h2>Our Services</h2>
+            <h2>Dịch vụ của chúng tôi</h2>
             <ul>
-                <li>Telecommunication Network Design</li>
-                <li>VoIP Solutions</li>
-                <li>Internet Services</li>
-                <li>Mobile Network Solutions</li>
+                <li>Thiết kế mạng viễn thông</li>
+                <li>Giải pháp VoIP</li>
+                <li>Dịch vụ Internet</li>
+                <li>Giải pháp mạng di động</li>
             </ul>
         </div>
         <div class="contact-info animated-element">
-            <h2>Contact Us</h2>
-            <p>Email: contact@teleconnect.com</p>
-            <p>Phone: +1234567890</p>
-            <p>Address: 123 Telecom Blvd, City, Country</p>
+            <h2>Liên hệ với chúng tôi</h2>
+            <p>Email: contact@vnpt.com</p>
+            <p>Điện thoại: +1234567890</p>
+            <p>Địa chỉ: 123 Đường Viễn Thông, Thành phố, Quốc gia</p>
         </div>
     </div>
 </template>
