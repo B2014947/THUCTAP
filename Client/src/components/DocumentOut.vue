@@ -1,39 +1,17 @@
 <template>
     <div class="document-management">
-        <h1>Quản lý văn bản đi</h1>
+        <h2>Danh sách văn bản gửi đi</h2>
 
         <!-- Form tìm kiếm -->
         <div class="search-form">
-            <h2>Tìm kiếm và cập nhật</h2>
             <form @submit.prevent="searchDocuments">
                 <div class="form-group">
-                    <input type="text" v-model="searchParams.name" placeholder="Tên văn bản">
-                    <input type="text" v-model="searchParams.sender" placeholder="Người gửi">
-                    <input type="text" v-model="searchParams.code" placeholder="Mã văn bản">
-                </div>
-                <div class="form-group">
-                    <select v-model="searchParams.status">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="Khởi tạo">Khởi tạo</option>
-                        <option value="Đang xử lý">Đang xử lý</option>
-                        <option value="Hoàn thành">Hoàn thành</option>
-                        <option value="Hủy văn bản">Hủy văn bản</option>
-                        <option value="Bị trả về">Bị trả về</option>
-                        <option value="Đã trả cho người nộp">Đã trả cho người nộp</option>
-                        <option value="Đã chuyển hồ sơ">Đã chuyển hồ sơ</option>
+                    <input type="text" v-model="searchTerm" placeholder="Tìm kiếm...">
+                    <select v-model="selectedPriority">
+                        <option value="">Tất cả ưu tiên</option>
+                        <option v-for="priority in priorities" :key="priority.id" :value="priority.name">{{
+                            priority.name }}</option>
                     </select>
-                    <input type="text" v-model="searchParams.department" placeholder="Chọn phòng ban">
-                    <select v-model="searchParams.documentType">
-                        <option value="">Tất cả loại văn bản</option>
-                        <option value="GM">Giấy mời</option>
-                        <option value="TB">Thông báo</option>
-                        <option value="KH">Kế hoạch</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" v-model="searchParams.priority" placeholder="Mức độ">
-                    <input type="date" v-model="searchParams.createdDate" placeholder="Ngày tạo">
-                    <input type="date" v-model="searchParams.updatedDate" placeholder="Ngày cập nhật">
                     <button type="submit">Tìm kiếm</button>
                 </div>
             </form>
@@ -41,49 +19,42 @@
 
         <!-- Bảng danh sách văn bản -->
         <div class="document-table">
-            <h2>Danh sách văn bản</h2>
-            <button @click="goToAddDocumentPage">Thêm văn bản</button>
             <table>
                 <thead>
                     <tr>
-                        <th>Mã văn bản</th>
+                        <th>ID</th>
                         <th>Tên văn bản</th>
                         <th>Loại văn bản</th>
                         <th>Người gửi</th>
-                        <th>Mức độ</th>
-                        <th>Trạng thái</th>
+                        <th class="priority">Ưu tiên</th>
+                        <th class="status">Trạng thái</th>
                         <th>Ghi chú</th>
                         <th>Vị trí hiện tại</th>
-                        <th>Ngày khởi tạo</th>
+                        <th>Ngày tạo</th>
                         <th>Ngày kết thúc</th>
-                        <th>File đính kèm</th>
+                        <th>Tệp đính kèm</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="document in filteredDocuments" :key="document.id">
-                        <td>{{ document.code }}</td>
+                        <td>{{ document.id }}</td>
                         <td>{{ document.name }}</td>
                         <td>{{ document.documentType }}</td>
                         <td>{{ document.sender }}</td>
-                        <td :class="priorityClass(document.priority)">{{ document.priority }}</td>
-                        <td :class="statusClass(document.status)">{{ document.status }}</td>
+                        <td class="priority" :class="priorityClass(document.priority)">{{ document.priority }}</td>
+                        <td class="status" :class="statusClass(document.status)">{{ document.status }}</td>
                         <td>{{ document.note }}</td>
                         <td>{{ document.currentPosition }}</td>
-                        <td>{{ document.createdDate }}</td>
-                        <td>{{ document.endDate }}</td>
+                        <td>{{ formatDateTime(document.createdDate) }}</td>
+                        <td>{{ formatDateTime(document.endDate) }}</td>
                         <td>
-                            <!-- Kiểm tra nếu có file đính kèm -->
-                            <template v-if="document.attachment">
-                                <a :href="document.attachment.url" target="_blank">{{ document.attachment.name }}</a>
-                            </template>
-                            <template v-else>
-                                Không có file đính kèm
-                            </template>
+                            <a :href="document.attachedFile" target="_blank" v-if="document.attachedFile">Xem tệp đính
+                                kèm</a>
+                            <span v-else>Không có tệp đính kèm</span>
                         </td>
                         <td>
-                            <button @click="viewDocument(document.id)">Xem chi tiết</button>
-                            <button @click="editDocument(document.id)">Sửa</button>
+                            <button @click="editDocument(document.id)">Chỉnh sửa</button>
                             <button @click="deleteDocument(document.id)">Xóa</button>
                         </td>
                     </tr>
@@ -94,113 +65,119 @@
 </template>
 
 <script>
-import { documentsOutgoing } from '@/data/documentsOutgoing.js';
-
 export default {
     data() {
         return {
-            searchParams: {
-                name: '',
-                sender: '',
-                code: '',
-                status: '',
-                department: '',
-                documentType: '',
-                priority: '',
-                createdDate: '',
-                updatedDate: ''
-            },
-            documents: documentsOutgoing,
-            newDocument: {
-                code: '',
-                name: '',
-                documentType: '',
-                sender: '',
-                priority: '',
-                status: '',
-                note: '',
-                currentPosition: ''
-            }
+            documents: [], // Danh sách văn bản
+            searchTerm: '', // Thuật ngữ tìm kiếm
+            selectedPriority: '', // Ưu tiên được chọn
+            priorities: [ // Danh sách ưu tiên
+                { id: 1, name: 'Bình thường' },
+                { id: 2, name: 'Quan trọng' },
+                { id: 3, name: 'Khẩn cấp' }
+            ]
         };
     },
-    computed: {
-        filteredDocuments() {
-            return this.documents.filter(document =>
-                this.matchSearchParams(document)
-            );
-        }
+    mounted() {
+        this.fetchDocuments();
     },
     methods: {
-        matchSearchParams(document) {
-            return (
-                document.name.toLowerCase().includes(this.searchParams.name.toLowerCase()) &&
-                document.sender.toLowerCase().includes(this.searchParams.sender.toLowerCase()) &&
-                document.code.toLowerCase().includes(this.searchParams.code.toLowerCase()) &&
-                (this.searchParams.status === '' || document.status === this.searchParams.status) &&
-                (this.searchParams.department === '' || document.department === this.searchParams.department) &&
-                (this.searchParams.documentType === '' || document.documentType === this.searchParams.documentType) &&
-                (this.searchParams.priority === '' || document.priority === this.searchParams.priority) &&
-                (this.searchParams.createdDate === '' || document.createdDate === this.searchParams.createdDate) &&
-                (this.searchParams.updatedDate === '' || document.updatedDate === this.searchParams.updatedDate)
-            );
-        },
-        searchDocuments() {
-            console.log('Đang tìm kiếm văn bản...');
-            // Xử lý tìm kiếm tại đây (ví dụ: gửi yêu cầu API, hoặc xử lý mảng dữ liệu)
-        },
-        goToAddDocumentPage() {
-            this.$router.push('/add-document'); // Điều hướng đến route "/add-document"
-        },
-        viewDocument(id) {
-            console.log('Xem chi tiết văn bản', id);
-            // Xử lý xem chi tiết văn bản (ví dụ: hiển thị popup, chuyển hướng trang, ...)
+        fetchDocuments() {
+            // Gọi API để lấy danh sách văn bản gửi đi từ đường dẫn của bạn
+            fetch('http://localhost:5000/api/documentsOutgoing')
+                .then(response => response.json())
+                .then(data => {
+                    this.documents = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching documents:', error);
+                });
         },
         editDocument(id) {
-            console.log('Chỉnh sửa văn bản', id);
-            // Xử lý chỉnh sửa văn bản (ví dụ: hiển thị form chỉnh sửa, gửi yêu cầu API, ...)
+            // Chuyển hướng hoặc thực hiện hành động chỉnh sửa văn bản
+            console.log('Chỉnh sửa văn bản có ID:', id);
         },
         deleteDocument(id) {
-            console.log('Xóa văn bản', id);
-            this.documents = this.documents.filter(document => document.id !== id);
-            // Xử lý xóa văn bản (ví dụ: gửi yêu cầu API, xóa khỏi mảng dữ liệu, ...)
+            // Xác nhận xóa văn bản
+            if (confirm('Bạn có chắc chắn muốn xóa văn bản này?')) {
+                // Gọi API để xóa văn bản
+                fetch(`http://localhost:5000/api/documentsOutgoing/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.message);
+                        // Sau khi xóa, cập nhật lại danh sách văn bản
+                        this.fetchDocuments();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting document:', error);
+                    });
+            }
+        },
+        searchDocuments() {
+            // Xử lý tìm kiếm với các tham số như searchTerm và selectedPriority
+            // Gọi API để tìm kiếm văn bản với các tham số này
+            console.log('Đang tìm kiếm với thuật ngữ:', this.searchTerm, 'và ưu tiên:', this.selectedPriority);
+        },
+        formatDateTime(dateTimeString) {
+            // Hàm định dạng ngày giờ
+            return new Date(dateTimeString).toLocaleString();
         },
         priorityClass(priority) {
-            switch (priority) {
-                case 'Khẩn cấp':
-                    return 'urgent';
-                case 'Ưu tiên':
-                    return 'priority';
-                case 'Bình thường':
-                    return 'normal';
-                default:
-                    return '';
+            // Hàm trả về lớp CSS tương ứng với mức ưu tiên
+            if (priority === 'Bình thường') {
+                return 'normal';
+            } else if (priority === 'Quan trọng') {
+                return 'priority';
+            } else if (priority === 'Khẩn cấp') {
+                return 'urgent';
+            } else {
+                return '';
             }
         },
         statusClass(status) {
+            // Hàm trả về lớp CSS tương ứng với trạng thái
             switch (status) {
-                case 'Khởi tạo':
+                case 'Đã khởi tạo':
                     return 'initiated';
                 case 'Đang xử lý':
                     return 'processing';
-                case 'Hoàn thành':
+                case 'Đã hoàn thành':
                     return 'completed';
-                case 'Hủy văn bản':
+                case 'Đã hủy bỏ':
                     return 'cancelled';
-                case 'Bị trả về':
+                case 'Đã trả lại':
                     return 'returned';
-                case 'Đã trả cho người nộp':
+                case 'Đã trả lại cho người gửi':
                     return 'returned-to-sender';
-                case 'Đã chuyển hồ sơ':
+                case 'Đã chuyển tiếp':
                     return 'transferred';
                 default:
                     return '';
             }
+        }
+    },
+    computed: {
+        filteredDocuments() {
+            // Lọc danh sách văn bản dựa trên thuật ngữ tìm kiếm và ưu tiên được chọn
+            if (!this.searchTerm && !this.selectedPriority) {
+                return this.documents;
+            }
+            return this.documents.filter(document => {
+                const matchesSearch = !this.searchTerm ||
+                    document.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+                const matchesPriority = !this.selectedPriority ||
+                    document.priority === this.selectedPriority;
+                return matchesSearch && matchesPriority;
+            });
         }
     }
 };
 </script>
 
 <style scoped>
+/* CSS đã được cung cấp */
 * {
     margin: 0;
     padding: 0;

@@ -94,7 +94,6 @@ router.post('/roles', (req, res) => {
 });
 
 // Cập nhật thông tin của một vai trò
-// Cập nhật thông tin của một vai trò theo ID
 router.put('/roles/:id', (req, res) => {
     const roleId = req.params.id;
     const { name, description, permissions } = req.body;
@@ -117,35 +116,68 @@ router.put('/roles/:id', (req, res) => {
                 return;
             }
 
-            // Thêm các quyền mới vào bảng role_permissions
-            const insertSql = 'INSERT INTO role_permissions (role_id, permission_id) VALUES ?';
-            const values = permissions.map(permissionId => [roleId, permissionId]);
+            // Kiểm tra nếu mảng permissions không rỗng, thì chèn các quyền mới vào bảng role_permissions
+            if (permissions.length > 0) {
+                const insertSql = 'INSERT INTO role_permissions (role_id, permission_id) VALUES ?';
+                const values = permissions.map(permissionId => [roleId, permissionId]);
 
-            db.query(insertSql, [values], (err, result) => {
-                if (err) {
-                    console.error('Error inserting into role_permissions: ' + err.stack);
-                    res.status(500).json({ error: 'Database error' });
-                    return;
-                }
-
-                // Lấy tên của các quyền từ bảng permissions
-                const permissionNamesSql = 'SELECT name FROM permissions WHERE id IN (?)';
-                db.query(permissionNamesSql, [permissions], (err, rows) => {
+                db.query(insertSql, [values], (err, result) => {
                     if (err) {
-                        console.error('Error fetching permission names: ' + err.stack);
+                        console.error('Error inserting into role_permissions: ' + err.stack);
                         res.status(500).json({ error: 'Database error' });
                         return;
                     }
 
-                    const permissionNames = rows.map(row => row.name);
-                    const updatedRole = { id: roleId, name, description, permissions: permissionNames };
+                    // Lấy tên của các quyền từ bảng permissions
+                    const permissionNamesSql = 'SELECT name FROM permissions WHERE id IN (?)';
+                    db.query(permissionNamesSql, [permissions], (err, rows) => {
+                        if (err) {
+                            console.error('Error fetching permission names: ' + err.stack);
+                            res.status(500).json({ error: 'Database error' });
+                            return;
+                        }
 
+                        const permissionNames = rows.map(row => row.name);
+
+                        // Cập nhật cột permissions của bảng roles
+                        const cleanedPermissions = JSON.stringify(permissionNames)
+                            .replace(/^\[|\]$/g, '') // Xóa cả dấu ngoặc vuông mở và đóng ở đầu và cuối chuỗi
+                            .replace(/","/g, ',') // Xóa dấu phẩy và dấu ngoặc kép ở giữa các phần tử của mảng
+                            .replace(/^"|"$/g, ''); // Xóa cả dấu ngoặc kép đầu và đuôi (nếu có)
+
+                        const updatePermissionsSql = 'UPDATE roles SET permissions = ? WHERE id = ?';
+                        db.query(updatePermissionsSql, [cleanedPermissions, roleId], (err, result) => {
+                            if (err) {
+                                console.error('Error updating permissions column: ' + err.stack);
+                                res.status(500).json({ error: 'Database error' });
+                                return;
+                            }
+
+                            const updatedRole = { id: roleId, name, description, permissions: permissionNames };
+                            res.json({ message: 'Role updated successfully', role: updatedRole });
+                        });
+                    });
+                });
+            } else {
+                // Nếu mảng permissions trống, cập nhật cột permissions của bảng roles với giá trị rỗng
+                const updatePermissionsSql = 'UPDATE roles SET permissions = ? WHERE id = ?';
+                db.query(updatePermissionsSql, ['', roleId], (err, result) => {
+                    if (err) {
+                        console.error('Error updating permissions column: ' + err.stack);
+                        res.status(500).json({ error: 'Database error' });
+                        return;
+                    }
+
+                    const updatedRole = { id: roleId, name, description, permissions: [] };
                     res.json({ message: 'Role updated successfully', role: updatedRole });
                 });
-            });
+            }
         });
     });
 });
+
+
+
 
 
 // Xóa một vai trò theo ID

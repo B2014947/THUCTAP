@@ -6,7 +6,24 @@ const router = express.Router();
 
 // Lấy danh sách thành viên
 router.get('/members', (req, res) => {
-    const sql = 'SELECT * FROM members';
+    const sql = `
+        SELECT 
+            members.id,
+            members.username,
+            members.fullName,
+            members.email,
+            members.phone,
+            departments.name AS department,
+            roles.name AS role,
+            members.status
+        FROM 
+            members
+        LEFT JOIN 
+            departments ON members.departmentId = departments.id
+        LEFT JOIN 
+            roles ON members.roleId = roles.id
+    `;
+
     db.query(sql, (err, results) => {
         if (err) {
             console.error('Lỗi truy vấn cơ sở dữ liệu: ' + err.stack);
@@ -16,6 +33,7 @@ router.get('/members', (req, res) => {
         res.json(results);
     });
 });
+
 
 // Lấy thông tin thành viên theo ID
 router.get('/members/member-details/:id', (req, res) => {

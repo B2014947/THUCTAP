@@ -4,7 +4,29 @@ const router = express.Router();
 
 // Lấy danh sách các văn bản gửi đi
 router.get('/documentsOutgoing', (req, res) => {
-    const sql = 'SELECT * FROM documentsOutgoing';
+    const sql = `
+        SELECT 
+            doc.id,
+            doc.name,
+            doc.documentType,
+            dt.name AS documentTypeName,
+            doc.sender,
+            mem.fullName AS senderName,
+            doc.priority,
+            doc.status,
+            doc.note,
+            doc.currentPosition,
+            doc.createdDate,
+            doc.endDate,
+            doc.attachedFile
+        FROM 
+            documentsOutgoing doc
+        LEFT JOIN 
+            documentTypes dt ON doc.documentType = dt.id
+        LEFT JOIN 
+            members mem ON doc.sender = mem.id
+    `;
+
     db.query(sql, (err, results) => {
         if (err) {
             console.error('Error querying database: ' + err.stack);
@@ -14,6 +36,7 @@ router.get('/documentsOutgoing', (req, res) => {
         res.json(results);
     });
 });
+
 
 // Lấy thông tin một văn bản gửi đi theo ID
 router.get('/documentsOutgoing/:id', (req, res) => {

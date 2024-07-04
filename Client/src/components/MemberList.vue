@@ -69,9 +69,12 @@ export default {
         member.username.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         member.fullName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         member.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        member.phone.includes(searchQuery.value)
+        member.phone.includes(searchQuery.value) ||
+        member.department.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        member.role.name.toLowerCase().includes(searchQuery.value.toLowerCase())
       );
     });
+
 
     const navigateToDetail = (id) => {
       router.push({ name: 'member.detail', params: { id: id } });
