@@ -48,6 +48,15 @@ const routerAdmin = [
                 }
             },
             {
+                path: "edit-department/:id",
+                name: "edit-department",
+                component: () => import("@/components/EditDepartment.vue"),
+                meta: {
+                    title: "Edit Department"
+                }
+            },
+
+            {
                 path: "member-list",
                 name: "member.list",
                 component: () => import("@/components/MemberList.vue"),
@@ -87,7 +96,14 @@ const routerAdmin = [
                     title: "Add New Role"
                 }
             },
-            // Thêm route cho quản lý văn bản
+            {
+                path: "edit-role/:id", // Thêm tham số id để chỉnh sửa vai trò cụ thể
+                name: "edit-role",
+                component: () => import("@/components/EditRole.vue"),
+                meta: {
+                    title: "Edit Role"
+                }
+            },
             {
                 path: "document-out",
                 name: "document.out",

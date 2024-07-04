@@ -2,7 +2,7 @@
     <div class="page-wrapper">
         <div class="department-list">
             <h1>Quản lý phòng ban</h1>
-            <button @click="navigateToAddNew()">Thêm mới</button>
+            <button @click="navigateToAddNew">Thêm mới</button>
             <input type="text" v-model="searchQuery" placeholder="Tìm kiếm theo tên phòng ban">
             <table>
                 <thead>
@@ -13,7 +13,7 @@
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="filteredDepartments.length > 0">
                     <tr v-for="(department, index) in filteredDepartments" :key="department.id">
                         <td>{{ index + 1 }}</td>
                         <td>{{ department.name }}</td>
@@ -24,42 +24,62 @@
                         </td>
                     </tr>
                 </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Không có dữ liệu phòng ban phù hợp</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
 </template>
 
 <script>
-import { departments } from '@/data/departments.js';
-import { ref, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-
+import axios from 'axios';
 export default {
     setup() {
         const searchQuery = ref('');
+        const filteredDepartments = ref([]);
         const router = useRouter();
 
-        const filteredDepartments = computed(() => {
-            return departments.filter(department =>
-                department.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-            );
-        });
-
-        const editDepartment = (id) => {
-            alert(`Chỉnh sửa phòng ban với ID: ${id}`);
+        // Function to fetch departments from backend
+        const fetchDepartments = () => {
+            axios.get('http://localhost:5000/api/departments')
+                .then(response => {
+                    filteredDepartments.value = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching departments: ', error);
+                });
         };
 
+        // Call fetchDepartments when component is mounted
+        onMounted(fetchDepartments);
+
+        // Function to edit department
+        const editDepartment = (id) => {
+            router.push({ name: 'edit-department', params: { id } });
+        };
+
+        // Function to delete department
         const deleteDepartment = (id) => {
             const confirmed = confirm(`Bạn có chắc muốn xóa phòng ban với ID: ${id}?`);
             if (confirmed) {
-                const index = departments.findIndex(department => department.id === id);
-                if (index !== -1) {
-                    departments.splice(index, 1);
-                    alert(`Đã xóa phòng ban với ID: ${id}`);
-                }
+                axios.delete(`http://localhost:5000/api/departments/${id}`)
+                    .then(() => {
+                        fetchDepartments(); // Refresh department list after deletion
+                        alert(`Đã xóa phòng ban với ID: ${id}`);
+                    })
+                    .catch(error => {
+                        console.error('Error deleting department: ', error);
+                        alert('Xóa phòng ban không thành công');
+                    });
             }
         };
 
+        // Function to navigate to add new department page
         const navigateToAddNew = () => {
             router.push('/add-new-department');
         };
@@ -74,6 +94,7 @@ export default {
     }
 };
 </script>
+
 
 <style scoped>
 * {

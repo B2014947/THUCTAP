@@ -29,7 +29,6 @@
           <td>{{ member.status }}</td>
           <td>
             <button @click="navigateToDetail(member.id)">Thông tin chi tiết</button>
-            <button @click="editMember(member.id)">Sửa</button>
             <button @click="deleteMember(member.id)">Xóa</button>
           </td>
         </tr>
@@ -48,6 +47,11 @@ export default {
     const router = useRouter();
     const searchQuery = ref('');
     const members = ref([]);
+
+    const navigateToAddNew = () => {
+      router.push({ name: 'add-new-member' });
+    };
+
 
     const fetchMembers = async () => {
       try {
@@ -85,12 +89,12 @@ export default {
         }
       }
     };
-
     return {
       searchQuery,
       filteredMembers,
       navigateToDetail,
       deleteMember,
+      navigateToAddNew
     };
   },
 };

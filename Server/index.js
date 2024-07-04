@@ -4,6 +4,8 @@ const cors = require('cors');
 const membersRouter = require('./router/members');
 const departmentsRouter = require('./router/departments');
 const rolesRouter = require('./router/roles');
+const permissionsRouter = require('./router/permissions');
+const rolePermissionsRouter = require('./router/rolePermissions');
 const documentTypesRouter = require('./router/documentTypes');
 const documentsOutgoingRouter = require('./router/documentsOutgoing');
 const documentsIncomingRouter = require('./router/documentsIncoming');
@@ -24,6 +26,8 @@ app.get('/public', (req, res) => {
 app.use(express.json());
 
 app.use('/api/', rolesRouter);
+app.use('/api/', permissionsRouter);
+app.use('/api/', rolePermissionsRouter);
 app.use('/api/', membersRouter);
 app.use('/api/', departmentsRouter);
 app.use('/api/', documentTypesRouter);

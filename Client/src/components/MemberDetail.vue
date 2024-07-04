@@ -38,10 +38,6 @@
                     <label>Địa chỉ:</label>
                     <input type="text" v-model="editedMember.address" :disabled="!isEditing">
                 </div>
-                <div class="detail-item" v-if="isEditing">
-                    <label>Mật khẩu:</label>
-                    <input type="password" v-model="editedMember.password">
-                </div>
             </div>
             <div class="detail-group">
                 <div class="detail-item">
@@ -84,6 +80,13 @@
                         </option>
                     </select>
                 </div>
+                <div class="detail-item">
+                    <label>Trạng thái:</label>
+                    <select v-model="editedMember.status" :disabled="!isEditing">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="button-container">
@@ -101,7 +104,6 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-
 export default {
     setup() {
         const member = ref(null);
@@ -141,8 +143,7 @@ export default {
         const saveChanges = async () => {
             try {
                 const { id, ...updateData } = editedMember.value;
-
-                await axios.put(`http://localhost:5000/api/members/${memberId}`, updateData);
+                await axios.put(`http://localhost:5000/api/members/member-details/${memberId}`, updateData);
                 Object.assign(member.value, editedMember.value); // Cập nhật thông tin thành viên
                 isEditing.value = false;
                 router.push('/member-list');
@@ -171,8 +172,8 @@ export default {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #fffffe;
+    color: #0f0e17;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -235,7 +236,7 @@ export default {
 button {
     padding: 10px 20px;
     background-color: #ff8906;
-    color: #ffffff;
+    color: #fffffe;
     border: none;
     border-radius: 5px;
     cursor: pointer;
